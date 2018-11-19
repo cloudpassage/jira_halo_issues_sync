@@ -1,0 +1,791 @@
+{
+  "status": "bad",
+  "reference_identifiers": [],
+  "findings": [
+    {
+      "status": "changed",
+      "detail": {
+        "status": [
+          "changed"
+        ],
+        "sha256": "cb1db9c0e14e935304a5984678c574266cc97c7741b4582be3eb1fff1c93cef1",
+        "meta": {
+          "size": 12288,
+          "group": "root",
+          "ctime": 1538758701,
+          "dev": 51714,
+          "nlink": 1,
+          "ino": 72,
+          "user": "root",
+          "mtime": 1538758701,
+          "uid": 0,
+          "gid": 0,
+          "atime": 1538758813,
+          "type": "regular",
+          "mode": "rw-r--r--"
+        },
+        "expected": [
+          {
+            "baseline_server_id": "e2e1a75cab0b11e883b31da62901cc2f",
+            "baseline_server_node_name": "ip-10-98-0-224",
+            "baseline_id": "ae358edaab0e11e8bf442bc3e7deaa6c",
+            "meta": {
+              "size": 12288,
+              "group": "root",
+              "ctime": 1535492784,
+              "dev": 51714,
+              "nlink": 1,
+              "ino": 72,
+              "user": "root",
+              "mtime": 1535492784,
+              "uid": 0,
+              "gid": 0,
+              "atime": 1535492784,
+              "type": "regular",
+              "mode": "rw-r--r--"
+            },
+            "baseline_server_platform": "Linux",
+            "baseline_server_ip_address": "10.98.0.224",
+            "baseline_date": "2018-08-28T22:07:05.587Z",
+            "sha256": "0d867a72a91ec1a6c76548203d114b868ebebda80b13c514462d29775b61c17b"
+          }
+        ]
+      },
+      "file": "/etc/aliases.db"
+    },
+    {
+      "status": "changed",
+      "detail": {
+        "status": [
+          "changed"
+        ],
+        "sha256": "49c93b9980f512ae5c6425f1ed8b39f16e0a965fbd278ee3c9d5a2e0b0d1cc4e",
+        "meta": {
+          "size": 123,
+          "group": "root",
+          "ctime": 1538758726,
+          "dev": 51714,
+          "nlink": 1,
+          "ino": 20971875,
+          "user": "root",
+          "mtime": 1538758726,
+          "uid": 0,
+          "gid": 0,
+          "atime": 1538758726,
+          "type": "regular",
+          "mode": "r--------"
+        },
+        "expected": [
+          {
+            "baseline_server_id": "e2e1a75cab0b11e883b31da62901cc2f",
+            "baseline_server_node_name": "ip-10-98-0-224",
+            "baseline_id": "ae358edaab0e11e8bf442bc3e7deaa6c",
+            "meta": {
+              "size": 123,
+              "group": "root",
+              "ctime": 1535492809,
+              "dev": 51714,
+              "nlink": 1,
+              "ino": 20971875,
+              "user": "root",
+              "mtime": 1535492809,
+              "uid": 0,
+              "gid": 0,
+              "atime": 1535492809,
+              "type": "regular",
+              "mode": "r--------"
+            },
+            "baseline_server_platform": "Linux",
+            "baseline_server_ip_address": "10.98.0.224",
+            "baseline_date": "2018-08-28T22:07:05.587Z",
+            "sha256": "edd03c8f596018c1c13dd22c162d9935c9dfb9caa1924c75f252729127fde91a"
+          }
+        ]
+      },
+      "file": "/etc/cfn/cfn-hup.conf"
+    },
+    {
+      "status": "changed",
+      "detail": {
+        "status": [
+          "changed"
+        ],
+        "sha256": "57800522bfdd44027e54384fbd29a501bb615a37c292fe86dcd40f89088dda7c",
+        "meta": {
+          "size": 42,
+          "group": "root",
+          "ctime": 1538758704,
+          "dev": 51714,
+          "nlink": 1,
+          "ino": 588208,
+          "user": "root",
+          "mtime": 1538758704,
+          "uid": 0,
+          "gid": 0,
+          "atime": 1538758813,
+          "type": "regular",
+          "mode": "rw-r--r--"
+        },
+        "expected": [
+          {
+            "baseline_server_id": "e2e1a75cab0b11e883b31da62901cc2f",
+            "baseline_server_node_name": "ip-10-98-0-224",
+            "baseline_id": "ae358edaab0e11e8bf442bc3e7deaa6c",
+            "meta": {
+              "size": 42,
+              "group": "root",
+              "ctime": 1535492787,
+              "dev": 51714,
+              "nlink": 1,
+              "ino": 588208,
+              "user": "root",
+              "mtime": 1535492787,
+              "uid": 0,
+              "gid": 0,
+              "atime": 1535492787,
+              "type": "regular",
+              "mode": "rw-r--r--"
+            },
+            "baseline_server_platform": "Linux",
+            "baseline_server_ip_address": "10.98.0.224",
+            "baseline_date": "2018-08-28T22:07:05.587Z",
+            "sha256": "9605183896079337d2edd3e130ade08f1f307cba9c1d3eb41c21cb0c44c58cd9"
+          }
+        ]
+      },
+      "file": "/etc/hostname"
+    },
+    {
+      "status": "changed",
+      "detail": {
+        "status": [
+          "changed"
+        ],
+        "sha256": "ee81db66e75a324ab770011568670ddacd1b35c0b6e0d48aacb2c468a21bd6b3",
+        "meta": {
+          "size": 33,
+          "group": "root",
+          "ctime": 1538758698,
+          "dev": 51714,
+          "nlink": 1,
+          "ino": 473750,
+          "user": "root",
+          "mtime": 1538758698,
+          "uid": 0,
+          "gid": 0,
+          "atime": 1538758699,
+          "type": "regular",
+          "mode": "r--r--r--"
+        },
+        "expected": [
+          {
+            "baseline_server_id": "e2e1a75cab0b11e883b31da62901cc2f",
+            "baseline_server_node_name": "ip-10-98-0-224",
+            "baseline_id": "ae358edaab0e11e8bf442bc3e7deaa6c",
+            "meta": {
+              "size": 33,
+              "group": "root",
+              "ctime": 1535492781,
+              "dev": 51714,
+              "nlink": 1,
+              "ino": 473750,
+              "user": "root",
+              "mtime": 1535492781,
+              "uid": 0,
+              "gid": 0,
+              "atime": 1535492781,
+              "type": "regular",
+              "mode": "r--r--r--"
+            },
+            "baseline_server_platform": "Linux",
+            "baseline_server_ip_address": "10.98.0.224",
+            "baseline_date": "2018-08-28T22:07:05.587Z",
+            "sha256": "0fd9d2c190df610bf7c8730ed9b6dae32c891b8b454d1d42f5c3405bd2bc74be"
+          }
+        ]
+      },
+      "file": "/etc/machine-id"
+    },
+    {
+      "status": "changed",
+      "detail": {
+        "status": [
+          "changed"
+        ],
+        "sha256": "c0f6dc2a424879632e37c916b2c96b52d4c101c760f6f77ead88b6ee1aaf0e23",
+        "meta": {
+          "size": 517,
+          "group": "root",
+          "ctime": 1538758704,
+          "dev": 51714,
+          "nlink": 1,
+          "ino": 588210,
+          "user": "root",
+          "mtime": 1538758704,
+          "uid": 0,
+          "gid": 0,
+          "atime": 1538758795,
+          "type": "regular",
+          "mode": "---------"
+        },
+        "expected": [
+          {
+            "baseline_server_id": "e2e1a75cab0b11e883b31da62901cc2f",
+            "baseline_server_node_name": "ip-10-98-0-224",
+            "baseline_id": "ae358edaab0e11e8bf442bc3e7deaa6c",
+            "meta": {
+              "size": 517,
+              "group": "root",
+              "ctime": 1535492787,
+              "dev": 51714,
+              "nlink": 1,
+              "ino": 588210,
+              "user": "root",
+              "mtime": 1535492787,
+              "uid": 0,
+              "gid": 0,
+              "atime": 1535492878,
+              "type": "regular",
+              "mode": "---------"
+            },
+            "baseline_server_platform": "Linux",
+            "baseline_server_ip_address": "10.98.0.224",
+            "baseline_date": "2018-08-28T22:07:05.587Z",
+            "sha256": "0861e106623011cab09d2476fb1bd948c1f12ebf2540b2a68c96f34bdc46c7a3"
+          }
+        ]
+      },
+      "file": "/etc/shadow"
+    },
+    {
+      "status": "changed",
+      "detail": {
+        "status": [
+          "changed"
+        ],
+        "sha256": "c0f6dc2a424879632e37c916b2c96b52d4c101c760f6f77ead88b6ee1aaf0e23",
+        "meta": {
+          "size": 517,
+          "group": "root",
+          "ctime": 1538758704,
+          "dev": 51714,
+          "nlink": 1,
+          "ino": 383505,
+          "user": "root",
+          "mtime": 1538758704,
+          "uid": 0,
+          "gid": 0,
+          "atime": 1538758812,
+          "type": "regular",
+          "mode": "---------"
+        },
+        "expected": [
+          {
+            "baseline_server_id": "e2e1a75cab0b11e883b31da62901cc2f",
+            "baseline_server_node_name": "ip-10-98-0-224",
+            "baseline_id": "ae358edaab0e11e8bf442bc3e7deaa6c",
+            "meta": {
+              "size": 517,
+              "group": "root",
+              "ctime": 1535492787,
+              "dev": 51714,
+              "nlink": 1,
+              "ino": 383505,
+              "user": "root",
+              "mtime": 1535492787,
+              "uid": 0,
+              "gid": 0,
+              "atime": 1535492787,
+              "type": "regular",
+              "mode": "---------"
+            },
+            "baseline_server_platform": "Linux",
+            "baseline_server_ip_address": "10.98.0.224",
+            "baseline_date": "2018-08-28T22:07:05.587Z",
+            "sha256": "0861e106623011cab09d2476fb1bd948c1f12ebf2540b2a68c96f34bdc46c7a3"
+          }
+        ]
+      },
+      "file": "/etc/shadow-"
+    },
+    {
+      "status": "changed",
+      "detail": {
+        "status": [
+          "changed"
+        ],
+        "sha256": "f24cce2472d84a92a3a5d62d3bcba169a19495bf60d78ea340671cc9f058fcb6",
+        "meta": {
+          "size": 227,
+          "group": "ssh_keys",
+          "ctime": 1538758704,
+          "dev": 51714,
+          "nlink": 1,
+          "ino": 8415344,
+          "user": "root",
+          "mtime": 1538758704,
+          "uid": 0,
+          "gid": 997,
+          "atime": 1538758705,
+          "type": "regular",
+          "mode": "rw-r-----"
+        },
+        "expected": [
+          {
+            "baseline_server_id": "e2e1a75cab0b11e883b31da62901cc2f",
+            "baseline_server_node_name": "ip-10-98-0-224",
+            "baseline_id": "ae358edaab0e11e8bf442bc3e7deaa6c",
+            "meta": {
+              "size": 227,
+              "group": "ssh_keys",
+              "ctime": 1535492787,
+              "dev": 51714,
+              "nlink": 1,
+              "ino": 8415344,
+              "user": "root",
+              "mtime": 1535492787,
+              "uid": 0,
+              "gid": 997,
+              "atime": 1535492788,
+              "type": "regular",
+              "mode": "rw-r-----"
+            },
+            "baseline_server_platform": "Linux",
+            "baseline_server_ip_address": "10.98.0.224",
+            "baseline_date": "2018-08-28T22:07:05.587Z",
+            "sha256": "8e483c7d233dcbfa03cbf444cea2602e3daadb24f5428e7bb8190a6e6c7140fb"
+          }
+        ]
+      },
+      "file": "/etc/ssh/ssh_host_ecdsa_key"
+    },
+    {
+      "status": "changed",
+      "detail": {
+        "status": [
+          "changed"
+        ],
+        "sha256": "7d3335067a09f0e2fa3d6234dad099ccfc140608c9bfe9539e03b07e39b23ea9",
+        "meta": {
+          "size": 162,
+          "group": "root",
+          "ctime": 1538758704,
+          "dev": 51714,
+          "nlink": 1,
+          "ino": 8415345,
+          "user": "root",
+          "mtime": 1538758704,
+          "uid": 0,
+          "gid": 0,
+          "atime": 1538758705,
+          "type": "regular",
+          "mode": "rw-r--r--"
+        },
+        "expected": [
+          {
+            "baseline_server_id": "e2e1a75cab0b11e883b31da62901cc2f",
+            "baseline_server_node_name": "ip-10-98-0-224",
+            "baseline_id": "ae358edaab0e11e8bf442bc3e7deaa6c",
+            "meta": {
+              "size": 162,
+              "group": "root",
+              "ctime": 1535492788,
+              "dev": 51714,
+              "nlink": 1,
+              "ino": 8415345,
+              "user": "root",
+              "mtime": 1535492787,
+              "uid": 0,
+              "gid": 0,
+              "atime": 1535492788,
+              "type": "regular",
+              "mode": "rw-r--r--"
+            },
+            "baseline_server_platform": "Linux",
+            "baseline_server_ip_address": "10.98.0.224",
+            "baseline_date": "2018-08-28T22:07:05.587Z",
+            "sha256": "882ee4cef709a45e2faea37b8de306f902cdd6ce3a435c7dd14ea2a6dce193f2"
+          }
+        ]
+      },
+      "file": "/etc/ssh/ssh_host_ecdsa_key.pub"
+    },
+    {
+      "status": "changed",
+      "detail": {
+        "status": [
+          "changed"
+        ],
+        "sha256": "59322c3e13ca84b164ccb57d828de78a0bc593d83c8e73afbd984acb54c825db",
+        "meta": {
+          "size": 387,
+          "group": "ssh_keys",
+          "ctime": 1538758704,
+          "dev": 51714,
+          "nlink": 1,
+          "ino": 8415346,
+          "user": "root",
+          "mtime": 1538758704,
+          "uid": 0,
+          "gid": 997,
+          "atime": 1538758705,
+          "type": "regular",
+          "mode": "rw-r-----"
+        },
+        "expected": [
+          {
+            "baseline_server_id": "e2e1a75cab0b11e883b31da62901cc2f",
+            "baseline_server_node_name": "ip-10-98-0-224",
+            "baseline_id": "ae358edaab0e11e8bf442bc3e7deaa6c",
+            "meta": {
+              "size": 387,
+              "group": "ssh_keys",
+              "ctime": 1535492788,
+              "dev": 51714,
+              "nlink": 1,
+              "ino": 8415346,
+              "user": "root",
+              "mtime": 1535492788,
+              "uid": 0,
+              "gid": 997,
+              "atime": 1535492788,
+              "type": "regular",
+              "mode": "rw-r-----"
+            },
+            "baseline_server_platform": "Linux",
+            "baseline_server_ip_address": "10.98.0.224",
+            "baseline_date": "2018-08-28T22:07:05.587Z",
+            "sha256": "9b17ef1fd75f4bf113d63efbcab1ed89dc80ed7b24598595352508002fb6adb6"
+          }
+        ]
+      },
+      "file": "/etc/ssh/ssh_host_ed25519_key"
+    },
+    {
+      "status": "changed",
+      "detail": {
+        "status": [
+          "changed"
+        ],
+        "sha256": "6d94d9b18a8fea514a1e299e20df62200394eca2d2d7533189322c722e43179a",
+        "meta": {
+          "size": 82,
+          "group": "root",
+          "ctime": 1538758704,
+          "dev": 51714,
+          "nlink": 1,
+          "ino": 8415347,
+          "user": "root",
+          "mtime": 1538758704,
+          "uid": 0,
+          "gid": 0,
+          "atime": 1538758705,
+          "type": "regular",
+          "mode": "rw-r--r--"
+        },
+        "expected": [
+          {
+            "baseline_server_id": "e2e1a75cab0b11e883b31da62901cc2f",
+            "baseline_server_node_name": "ip-10-98-0-224",
+            "baseline_id": "ae358edaab0e11e8bf442bc3e7deaa6c",
+            "meta": {
+              "size": 82,
+              "group": "root",
+              "ctime": 1535492788,
+              "dev": 51714,
+              "nlink": 1,
+              "ino": 8415347,
+              "user": "root",
+              "mtime": 1535492788,
+              "uid": 0,
+              "gid": 0,
+              "atime": 1535492788,
+              "type": "regular",
+              "mode": "rw-r--r--"
+            },
+            "baseline_server_platform": "Linux",
+            "baseline_server_ip_address": "10.98.0.224",
+            "baseline_date": "2018-08-28T22:07:05.587Z",
+            "sha256": "1bec538e81433db26e76e6b703afe16f6e3dfe23367cc2bc3b4c8d4e484e3e68"
+          }
+        ]
+      },
+      "file": "/etc/ssh/ssh_host_ed25519_key.pub"
+    },
+    {
+      "status": "changed",
+      "detail": {
+        "status": [
+          "changed"
+        ],
+        "sha256": "292e3454e7999d4e29caa1e9eb835b14e98ea695b69ec5283d3ed43283f4e27c",
+        "meta": {
+          "size": 1679,
+          "group": "ssh_keys",
+          "ctime": 1538758704,
+          "dev": 51714,
+          "nlink": 1,
+          "ino": 8415342,
+          "user": "root",
+          "mtime": 1538758704,
+          "uid": 0,
+          "gid": 997,
+          "atime": 1538758705,
+          "type": "regular",
+          "mode": "rw-r-----"
+        },
+        "expected": [
+          {
+            "baseline_server_id": "e2e1a75cab0b11e883b31da62901cc2f",
+            "baseline_server_node_name": "ip-10-98-0-224",
+            "baseline_id": "ae358edaab0e11e8bf442bc3e7deaa6c",
+            "meta": {
+              "size": 1679,
+              "group": "ssh_keys",
+              "ctime": 1535492787,
+              "dev": 51714,
+              "nlink": 1,
+              "ino": 8415342,
+              "user": "root",
+              "mtime": 1535492787,
+              "uid": 0,
+              "gid": 997,
+              "atime": 1535492788,
+              "type": "regular",
+              "mode": "rw-r-----"
+            },
+            "baseline_server_platform": "Linux",
+            "baseline_server_ip_address": "10.98.0.224",
+            "baseline_date": "2018-08-28T22:07:05.587Z",
+            "sha256": "edd1393c36cbf344d943a5c20474851f0d7bb94f931fad1b564c200b813eba61"
+          }
+        ]
+      },
+      "file": "/etc/ssh/ssh_host_rsa_key"
+    },
+    {
+      "status": "changed",
+      "detail": {
+        "status": [
+          "changed"
+        ],
+        "sha256": "27107ab327e3a1633d1efb133f2fd1a4841290f123989815c07a694d586de702",
+        "meta": {
+          "size": 382,
+          "group": "root",
+          "ctime": 1538758704,
+          "dev": 51714,
+          "nlink": 1,
+          "ino": 8415343,
+          "user": "root",
+          "mtime": 1538758704,
+          "uid": 0,
+          "gid": 0,
+          "atime": 1538758705,
+          "type": "regular",
+          "mode": "rw-r--r--"
+        },
+        "expected": [
+          {
+            "baseline_server_id": "e2e1a75cab0b11e883b31da62901cc2f",
+            "baseline_server_node_name": "ip-10-98-0-224",
+            "baseline_id": "ae358edaab0e11e8bf442bc3e7deaa6c",
+            "meta": {
+              "size": 382,
+              "group": "root",
+              "ctime": 1535492787,
+              "dev": 51714,
+              "nlink": 1,
+              "ino": 8415343,
+              "user": "root",
+              "mtime": 1535492787,
+              "uid": 0,
+              "gid": 0,
+              "atime": 1535492788,
+              "type": "regular",
+              "mode": "rw-r--r--"
+            },
+            "baseline_server_platform": "Linux",
+            "baseline_server_ip_address": "10.98.0.224",
+            "baseline_date": "2018-08-28T22:07:05.587Z",
+            "sha256": "ee555e7c9cf4976f2b8b494b2ab363f821d4bb6a15d7f2f45641d73b424b3383"
+          }
+        ]
+      },
+      "file": "/etc/ssh/ssh_host_rsa_key.pub"
+    },
+    {
+      "status": "changed",
+      "detail": {
+        "status": [
+          "changed"
+        ],
+        "sha256": "5082142110cc8f215fad4d5a4e514411ba487aef7a1c8b4eef09972ec9e572dc",
+        "meta": {
+          "size": 127,
+          "group": "root",
+          "ctime": 1538758704,
+          "dev": 51714,
+          "nlink": 1,
+          "ino": 12583905,
+          "user": "root",
+          "mtime": 1538758704,
+          "uid": 0,
+          "gid": 0,
+          "atime": 1538758813,
+          "type": "regular",
+          "mode": "r--r-----"
+        },
+        "expected": [
+          {
+            "baseline_server_id": "e2e1a75cab0b11e883b31da62901cc2f",
+            "baseline_server_node_name": "ip-10-98-0-224",
+            "baseline_id": "ae358edaab0e11e8bf442bc3e7deaa6c",
+            "meta": {
+              "size": 127,
+              "group": "root",
+              "ctime": 1535492787,
+              "dev": 51714,
+              "nlink": 1,
+              "ino": 12583905,
+              "user": "root",
+              "mtime": 1535492787,
+              "uid": 0,
+              "gid": 0,
+              "atime": 1535492787,
+              "type": "regular",
+              "mode": "r--r-----"
+            },
+            "baseline_server_platform": "Linux",
+            "baseline_server_ip_address": "10.98.0.224",
+            "baseline_date": "2018-08-28T22:07:05.587Z",
+            "sha256": "ffd09f622d4105827ba7fd260cfb4f62d2667b0e364f81f07100e6a25539b315"
+          }
+        ]
+      },
+      "file": "/etc/sudoers.d/90-cloud-init-users"
+    },
+    {
+      "status": "changed",
+      "detail": {
+        "status": [
+          "changed"
+        ],
+        "sha256": "ae9d8919454460f56843478aebf9d0cb0786ed944d2dc0d5e2498cd336603545",
+        "meta": {
+          "size": 159,
+          "group": "root",
+          "ctime": 1538758702,
+          "dev": 51714,
+          "nlink": 1,
+          "ino": 474152,
+          "user": "root",
+          "mtime": 1538758702,
+          "uid": 0,
+          "gid": 0,
+          "atime": 1538758813,
+          "type": "regular",
+          "mode": "rw-r--r--"
+        },
+        "expected": [
+          {
+            "baseline_server_id": "e2e1a75cab0b11e883b31da62901cc2f",
+            "baseline_server_node_name": "ip-10-98-0-224",
+            "baseline_id": "ae358edaab0e11e8bf442bc3e7deaa6c",
+            "meta": {
+              "size": 159,
+              "group": "root",
+              "ctime": 1535492785,
+              "dev": 51714,
+              "nlink": 1,
+              "ino": 474152,
+              "user": "root",
+              "mtime": 1535492785,
+              "uid": 0,
+              "gid": 0,
+              "atime": 1535492784,
+              "type": "regular",
+              "mode": "rw-r--r--"
+            },
+            "baseline_server_platform": "Linux",
+            "baseline_server_ip_address": "10.98.0.224",
+            "baseline_date": "2018-08-28T22:07:05.587Z",
+            "sha256": "d1fa23f032202582e53f9b9b8ba1f4a6d3e6e994e537938144ad45ae7518a6c6"
+          }
+        ]
+      },
+      "file": "/etc/sysconfig/network-scripts/ifcfg-eth0"
+    },
+    {
+      "status": "changed",
+      "detail": {
+        "status": [
+          "changed"
+        ],
+        "sha256": "4dad4ba4bbf056c4e9f07ff9aecfc81660d40d4d5c343f2ab133465972369f64",
+        "meta": {
+          "size": 96,
+          "group": "root",
+          "ctime": 1538758702,
+          "dev": 51714,
+          "nlink": 1,
+          "ino": 8588424,
+          "user": "root",
+          "mtime": 1538758702,
+          "uid": 0,
+          "gid": 0,
+          "atime": 1538758702,
+          "type": "regular",
+          "mode": "rw-r--r--"
+        },
+        "expected": [
+          {
+            "baseline_server_id": "e2e1a75cab0b11e883b31da62901cc2f",
+            "baseline_server_node_name": "ip-10-98-0-224",
+            "baseline_id": "ae358edaab0e11e8bf442bc3e7deaa6c",
+            "meta": {
+              "size": 96,
+              "group": "root",
+              "ctime": 1535492785,
+              "dev": 51714,
+              "nlink": 1,
+              "ino": 8588424,
+              "user": "root",
+              "mtime": 1535492785,
+              "uid": 0,
+              "gid": 0,
+              "atime": 1535492785,
+              "type": "regular",
+              "mode": "rw-r--r--"
+            },
+            "baseline_server_platform": "Linux",
+            "baseline_server_ip_address": "10.98.0.224",
+            "baseline_date": "2018-08-28T22:07:05.587Z",
+            "sha256": "2de8c4da1808c958f96b7869697e65df4ec469f4cf4b057359c98ad22e7e374d"
+          }
+        ]
+      },
+      "file": "/etc/udev/rules.d/70-persistent-net.rules"
+    }
+  ],
+  "starting_at": "https://api.cloudpassage.com/v1/scans/ac987428c8c011e8ab954f371e7d3a9a/findings/cb7cc16ec8c011e89b190bdd127e2787?per_page=100",
+  "url": "https://api.cloudpassage.com/v1/scans/ac987428c8c011e8ab954f371e7d3a9a/findings/cb7cc16ec8c011e89b190bdd127e2787",
+  "rule": {
+    "log": true,
+    "recurse": true,
+    "alert": false,
+    "critical": false,
+    "target": "/etc",
+    "policy_id": "fd2e2b50ab0411e8b00b216f99a1cffd",
+    "description": "The /etc directory hierarchy contains configuration files. \\n\\n"
+  },
+  "next": "",
+  "per_page": 100,
+  "counts": {
+    "added": 0,
+    "ok": 2407,
+    "changed": 15,
+    "missing": 0
+  },
+  "id": "cb7cc16ec8c011e89b190bdd127e2787"
+}

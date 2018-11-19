@@ -1,0 +1,21 @@
+{
+  "agent_id": "57cbf1a8e13511e88de305fcf6ce4c89",
+  "comment": null,
+  "created_at": "2018-11-05T19:59:54.261379Z",
+  "critical": false,
+  "group_id": "82790550a57911e88aea41f1795e3a04",
+  "issue_type": "sva",
+  "last_seen_at": "2018-11-05T20:03:59.015Z",
+  "name": "libgcrypt20:amd64",
+  "os_type": "Linux",
+  "policy_id": "null_value",
+  "policy_name": null,
+  "resolved_at": null,
+  "resolved_by": null,
+  "rule_key": "sva::::libgcrypt20:amd64",
+  "status": "active",
+  "id": "5cde8d72e13511e893cd39d8aad7e50a",
+  "url": "https://api.cloudpassage.com/v1/issues/5cde8d72e13511e893cd39d8aad7e50a",
+  "agent_url": "https://api.cloudpassage.com/v1/servers/57cbf1a8e13511e88de305fcf6ce4c89",
+  "policy_url": "null_value"
+}

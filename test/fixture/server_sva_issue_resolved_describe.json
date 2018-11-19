@@ -1,0 +1,29 @@
+{
+  "comment": "Server retired.",
+  "status": "resolved",
+  "resolved_at": "2018-10-29T21:31:17.046Z",
+  "name": "dhcp-common.x86_64",
+  "rule_key": "sva::::dhcp-common.x86_64",
+  "url": "https://api.cloudpassage.com/v1/issues/11a7b584c42c11e897610d4470cec0a3",
+  "created_at": "2018-09-29T21:10:18.86Z",
+  "updated_at": "2018-09-29T21:10:18.885952Z",
+  "policy_name": "",
+  "agent_url": "https://api.cloudpassage.com/v1/servers/e9cb548ac42b11e88b6c63236c83ec8b",
+  "policy_url": "null_value",
+  "critical": true,
+  "agent_id": "e9cb548ac42b11e88b6c63236c83ec8b",
+  "issue_type": "sva",
+  "resolved_by": "system",
+  "id": "11a7b584c42c11e897610d4470cec0a3",
+  "last_seen_at": "2018-09-29T21:10:18.856Z",
+  "group_id": "b36fd64c936e11e8bcd143a29d6e4ea0",
+  "os_type": "linux",
+  "findings": [
+    {
+      "finding": "https://api.cloudpassage.com/v1/scans/0f027418c42c11e897610d4470cec0a3/findings/10aad512c42c11e897610d4470cec0a3",
+      "issue_created_at": "2018-09-29T21:10:18.856Z",
+      "issue_status": "active"
+    }
+  ],
+  "policy_id": "null_value"
+}

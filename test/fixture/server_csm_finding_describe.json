@@ -1,0 +1,22 @@
+{
+  "status": "bad",
+  "reference_identifiers": [],
+  "url": "https://api.cloudpassage.com/v1/scans/2f0389dac8c011e8b1e40365c22b7bb6/findings/2f6a0016c8c011e8b1e40365c22b7bb6",
+  "rule_operator": "AND",
+  "id": "2f6a0016c8c011e8b1e40365c22b7bb6",
+  "rule_name": "1.1.10 Ensure separate partition exists for /var/log",
+  "critical": false,
+  "details": [
+    {
+      "status": "bad",
+      "actual": false,
+      "target": "/etc/fstab",
+      "check_id": 4794544,
+      "pattern": "\\\\s\\\\/var\\\\/log\\\\s",
+      "expected": true,
+      "type": "file_regex",
+      "scan_status": "ok"
+    }
+  ],
+  "rule_description": "The /var/log directory is used by system services to store log data .\\n\\nThere are two important reasons to ensure that system logs are stored on a separate partition: protection against resource exhaustion (since logs can grow quite large) and protection of audit data.\\n\\nResizing filesystems is a common activity in cloud-hosted servers. Separate filesystem partitions may prevent successful resizing, or may require the installation of additional tools solely for the purpose of resizing operations. The use of these additional tools may introduce their own security considerations.\\n\\nCIS Critical Controls:\\nTitle: Ensure Audit Logging Systems Are Not Subject To Loss (i.e. rotation/archive) \\nControl number: 6.3 \\n\\nAJ Lewis, \\LVM HOWTO\\, http://tldp.org/HOWTO/LVM-HOWTO/"
+}

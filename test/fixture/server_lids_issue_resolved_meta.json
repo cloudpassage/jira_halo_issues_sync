@@ -1,0 +1,21 @@
+{
+  "comment": "",
+  "status": "resolved",
+  "resolved_at": "2018-11-06T18:07:52.119Z",
+  "name": "Software was installed",
+  "rule_key": "lids::306251::Software was installed",
+  "url": "https://api.cloudpassage.com/v1/issues/0d9bca94e13611e8bc744368468e4f98",
+  "created_at": "2018-11-05T20:04:50.79035Z",
+  "policy_name": "",
+  "agent_url": "https://api.cloudpassage.com/v1/servers/57cbf1a8e13511e88de305fcf6ce4c89",
+  "policy_url": "https://api.cloudpassage.com/v1/lids_policies/c1722a9ce13411e88190050c5a1aeca3",
+  "critical": false,
+  "agent_id": "57cbf1a8e13511e88de305fcf6ce4c89",
+  "issue_type": "lids",
+  "resolved_by": "toolbox@cloudpasssage.com",
+  "id": "0d9bca94e13611e8bc744368468e4f98",
+  "last_seen_at": null,
+  "group_id": "82790550a57911e88aea41f1795e3a04",
+  "os_type": "linux",
+  "policy_id": "c1722a9ce13411e88190050c5a1aeca3"
+}

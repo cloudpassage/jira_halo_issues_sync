@@ -1,0 +1,105 @@
+{
+  "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations",
+  "id": "910689",
+  "self": "https://whatever.atlassian.net/rest/api/2/issue/910689",
+  "key": "AB-263",
+  "fields": {
+    "customfield_901001": null,
+    "fixVersions": [],
+    "resolution": {
+      "self": "https://whatever.atlassian.net/rest/api/2/resolution/10000",
+      "id": "10000",
+      "description": "",
+      "name": "Done"
+    },
+    "lastViewed": "2018-11-05T14:48:06.587-0800",
+    "assignee": {
+      "self": "https://whatever.atlassian.net/rest/api/2/user?accountId=somebody",
+      "name": "none@example.com",
+      "key": "none@example.com",
+      "accountId": "abcde",
+      "emailAddress": "none@example.com",
+      "avatarUrls": {},
+      "displayName": "Nooo Body",
+      "active": false,
+      "timeZone": "America/Los_Angeles"
+    },
+    "status": {
+      "self": "https://whatever.atlassian.net/rest/api/2/status/6",
+      "description": "The issue is considered finished, the resolution is correct. Issues which are closed can be reopened.",
+      "iconUrl": "https://whatever.atlassian.net/images/icons/statuses/closed.png",
+      "name": "closed",
+      "id": "6",
+      "statusCategory": {
+        "self": "https://whatever.atlassian.net/rest/api/2/statuscategory/3",
+        "id": 3,
+        "key": "done",
+        "colorName": "green",
+        "name": "Done"
+      }
+    },
+    "components": [],
+    "creator": {
+      "self": "https://whatever.atlassian.net/rest/api/2/user?accountId=abcdef",
+      "name": "none",
+      "key": "none",
+      "accountId": "abcdef",
+      "emailAddress": "none1@example.com",
+      "avatarUrls": {},
+      "displayName": "none 1",
+      "active": false,
+      "timeZone": "America/Havana"
+    },
+    "subtasks": [],
+    "reporter": {
+      "self": "https://whatever.atlassian.net/rest/api/2/user?accountId=asdfg",
+      "name": "snicholson",
+      "key": "snicholson",
+      "accountId": "asdfg",
+      "emailAddress": "none1@example.com",
+      "avatarUrls": {},
+      "displayName": "none 1",
+      "active": false,
+      "timeZone": "America/Havana"
+    },
+    "votes": {
+      "self": "https://whatever.atlassian.net/rest/api/2/issue/AB-263/votes",
+      "votes": 0,
+      "hasVoted": false
+    },
+    "issuetype": {
+      "self": "https://whatever.atlassian.net/rest/api/2/issuetype/3",
+      "id": "3",
+      "description": "A task that needs to be done.",
+      "iconUrl": "https://whatever.atlassian.net/secure/viewavatar?size=xsmall&avatarId=900118&avatarType=issuetype",
+      "name": "Task",
+      "subtask": false,
+      "avatarId": 900118
+    },
+    "project": {
+      "self": "https://whatever.atlassian.net/rest/api/2/project/11",
+      "id": "11",
+      "key": "AB",
+      "name": "AB",
+      "projectTypeKey": "software",
+      "avatarUrls": {}
+    },
+    "resolutiondate": "2017-06-19T13:37:53.922-0700",
+    "workratio": -1,
+    "watches": {
+      "self": "https://whatever.atlassian.net/rest/api/2/issue/AB-263/watchers",
+      "watchCount": 1,
+      "isWatching": false
+    },
+    "created": "2017-04-19T14:37:41.477-0700",
+    "updated": "2017-06-19T13:38:31.106-0700",
+    "description": "Vulnerability detected by Halo blahblah",
+    "summary": "Vulnerability needs fixing",
+    "comment": {
+      "comments": [],
+      "maxResults": 0,
+      "total": 0,
+      "startAt": 0
+    }
+  }
+}
