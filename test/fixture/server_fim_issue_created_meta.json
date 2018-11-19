@@ -1,0 +1,21 @@
+{
+  "agent_id": "57cbf1a8e13511e88de305fcf6ce4c89",
+  "comment": null,
+  "created_at": "2018-11-05T19:59:55.6855Z",
+  "critical": false,
+  "group_id": "82790550a57911e88aea41f1795e3a04",
+  "issue_type": "fim",
+  "last_seen_at": "2018-11-05T20:03:57.371Z",
+  "name": "/usr/sbin",
+  "os_type": "Linux",
+  "policy_id": "b5b584aab2d211e8ba1955031e61cd96",
+  "policy_name": "Core System Files (Amazon Linux) v2.1 2018-09-07 19:17:49-Copy",
+  "resolved_at": null,
+  "resolved_by": null,
+  "rule_key": "fim::656816::User system binaries::/usr/sbin",
+  "status": "active",
+  "id": "5db6d48ee13511e8af163f606bee0bb2",
+  "url": "https://api.cloudpassage.com/v1/issues/5db6d48ee13511e8af163f606bee0bb2",
+  "agent_url": "https://api.cloudpassage.com/v1/servers/57cbf1a8e13511e88de305fcf6ce4c89",
+  "policy_url": "https://api.cloudpassage.com/v1/fim_policies/b5b584aab2d211e8ba1955031e61cd96"
+}

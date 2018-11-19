@@ -1,0 +1,21 @@
+{
+  "agent_id": "57cbf1a8e13511e88de305fcf6ce4c89",
+  "comment": null,
+  "created_at": "2018-11-05T20:24:33.622Z",
+  "critical": false,
+  "group_id": "82790550a57911e88aea41f1795e3a04",
+  "issue_type": "csm",
+  "last_seen_at": "2018-11-05T20:24:33.622Z",
+  "name": "6.2.7 Ensure all users' home directories exist",
+  "os_type": "Linux",
+  "policy_id": "4dc664e4937011e8b3763b9f5d5b47ba",
+  "policy_name": "CIS Benchmark for Ubuntu Linux 16.04 LTS v1.1",
+  "resolved_at": null,
+  "resolved_by": null,
+  "rule_key": "csm::3330114::6.2.7 Ensure all users' home directories exist",
+  "status": "active",
+  "id": "cea644ece13811e8a1ee31d06c44c3de",
+  "url": "https://api.cloudpassage.com/v1/issues/cea644ece13811e8a1ee31d06c44c3de",
+  "agent_url": "https://api.cloudpassage.com/v1/servers/57cbf1a8e13511e88de305fcf6ce4c89",
+  "policy_url": "https://api.cloudpassage.com/v1/policies/4dc664e4937011e8b3763b9f5d5b47ba"
+}

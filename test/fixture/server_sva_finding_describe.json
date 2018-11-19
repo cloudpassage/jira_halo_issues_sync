@@ -1,0 +1,16 @@
+{
+  "status": "bad",
+  "package_name": "dhcp-common.x86_64",
+  "url": "https://api.cloudpassage.com/v1/scans/0f027418c42c11e897610d4470cec0a3/findings/10aad512c42c11e897610d4470cec0a3",
+  "package_version": "12:4.2.5-68.el7",
+  "cpe": "not_found",
+  "critical": true,
+  "cve_entries": [
+    {
+      "cve_entry": "CVE-2018-1111",
+      "cvss_score": 7.9,
+      "suppressed": false
+    }
+  ],
+  "id": "10aad512c42c11e897610d4470cec0a3"
+}

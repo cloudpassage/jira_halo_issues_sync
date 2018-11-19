@@ -1,0 +1,34 @@
+{
+  "comment": "Server retired.",
+  "status": "resolved",
+  "resolved_at": "2018-11-04T17:31:24.922Z",
+  "name": "/etc",
+  "findings": [
+    {
+      "finding": "https://api.cloudpassage.com/v1/scans/23986098c8c011e88799417385374c58/findings/23e882d0c8c011e88799417385374c58",
+      "issue_created_at": "2018-10-05T17:00:20.931Z",
+      "issue_status": "active"
+    },
+    {
+      "finding": "https://api.cloudpassage.com/v1/scans/ac987428c8c011e8ab954f371e7d3a9a/findings/cb7cc16ec8c011e89b190bdd127e2787",
+      "issue_created_at": "2018-10-05T17:05:01.808Z",
+      "issue_status": "active"
+    }
+  ],
+  "rule_key": "fim::652323::The /etc directory hierarchy contains configuration files.::/etc",
+  "created_at": "2018-10-05T17:00:20.965Z",
+  "updated_at": "2018-10-05T17:05:01.821Z",
+  "policy_name": "Core System Files (Ubuntu) v2.1 SDK",
+  "url": "https://api.cloudpassage.com/v1/issues/24b107d2c8c011e88799417385374c58",
+  "policy_url": "https://api.cloudpassage.com/v1/fim_policies/fd2e2b50ab0411e8b00b216f99a1cffd",
+  "critical": false,
+  "agent_id": "f1520c60c8bf11e8a3f26f8eb4fc88a5",
+  "issue_type": "fim",
+  "resolved_by": "system",
+  "id": "24b107d2c8c011e88799417385374c58",
+  "last_seen_at": "2018-10-05T17:00:20.931Z",
+  "group_id": "6ef64f6cab0311e890737b9e592e55bd",
+  "agent_url": "https://api.cloudpassage.com/v1/servers/f1520c60c8bf11e8a3f26f8eb4fc88a5",
+  "os_type": "linux",
+  "policy_id": "fd2e2b50ab0411e8b00b216f99a1cffd"
+}
