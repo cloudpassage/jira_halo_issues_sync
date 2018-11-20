@@ -1,6 +1,6 @@
 from jira import JIRA
 from logger import Logger
-import pprint
+
 
 class JiraLocal(object):
     """Manage interactions with Jira.
@@ -37,7 +37,7 @@ class JiraLocal(object):
         return results
 
     def create_jira_issue(self, summary, description, halo_issue_id,
-                           field_mapping={}):
+                          field_mapping={}):
         """Create a Jira issue, return issue ID.
 
         Args:
@@ -51,9 +51,12 @@ class JiraLocal(object):
         """
         base_fields = {self.issue_id_field: halo_issue_id}
         field_mapping.update(base_fields)
-        new_issue = self.jira_instance.create_issue(project=self.default_project_id,
-                                                    issuetype={'name': self.default_issue_type},
-                                                    summary=summary, description=description)
+        project = self.default_project_id
+        issue_type = {'name': self.default_issue_type}
+        new_issue = self.jira_instance.create_issue(project=project,
+                                                    issuetype=issue_type,
+                                                    summary=summary,
+                                                    description=description)
         new_issue.update(fields=field_mapping)
         return new_issue.key
 
@@ -72,5 +75,6 @@ class JiraLocal(object):
             msg = "Unable to transition {} via {}".format(issue_id, transition)
             self.log.error(msg)
         else:
-            self.jira_instance.transition_issue(issue, resolution=options[0][0])
+            resolution = options[0][0]
+            self.jira_instance.transition_issue(issue, resolution=resolution)
         return

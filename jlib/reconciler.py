@@ -4,6 +4,7 @@ from formatter import Formatter
 from logger import Logger
 from mapper import Mapper
 
+
 class Reconciler(object):
     """Reconcile issues between Halo and Jira.
 
@@ -54,8 +55,8 @@ class Reconciler(object):
         """Create an issue in Jira for corresponding Halo issue."""
         issue_type = issue_described["issue_type"]
         # This will be refactored when we support more asset types.
-        asset_type = "server" if "agent_id" in issue_described else "Unrecognized"
-        asset_id = issue_described["agent_id"] if asset_type == "server" else "NONE"
+        asset_type = "server" if "agent_id" in issue_described else "Unrecognized"  # NOQA
+        asset_id = issue_described["agent_id"] if asset_type == "server" else "NONE"  # NOQA
         asset_described = self.halo.describe_asset(asset_type, asset_id)
         asset_formatted = Formatter.format_object("asset", "server",
                                                   asset_described)
@@ -67,7 +68,7 @@ class Reconciler(object):
         finding_meta = issue_described["findings"][-1]
         finding_described = self.halo.describe_finding(finding_meta["finding"])
         finding_formatted = Formatter.format_object("finding", issue_type,
-                                                     finding_described)
+                                                    finding_described)
         summary = Formatter.format_summary(asset_type, issue_type,
                                            asset_described)
         description = "\n----\n".join([finding_formatted, asset_formatted,
@@ -91,7 +92,7 @@ class Reconciler(object):
             issue_type = issue_described["issue_type"]
             finding_meta = issue_described["findings"][-1]
         except KeyError as e:
-            msg = "Unable to parse Halo issue: {}\n{}".format(str(e), str(issue_described))
+            msg = "Unable to parse Halo issue: {}\n{}".format(str(e), str(issue_described))  # NOQA
             self.logger.error(msg)
         finding_described = self.halo.describe_finding(finding_meta["finding"])
         finding_formatted = Formatter.format_object("finding", issue_type,

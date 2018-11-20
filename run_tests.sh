@@ -8,12 +8,13 @@ echo "Testing requires the following environment variables to be set:"
 echo "HALO_API_KEY"
 echo "HALO_API_SECRET_KEY"
 echo "JIRA_API_URL"
+echo "JIRA_API_USER"
 echo "JIRA_API_TOKEN"
 echo "JIRA_ISSUE_ID_FIELD"
 echo "JIRA_PROJECT_KEY"
 echo "ISSUE_CLOSE_TRANSITION"
 echo "ISSUE_REOPEN_TRANSITION"
-echo "JIRA_TICKET_TYPE"
+echo "JIRA_ISSUE_TYPE"
 
 if [ -z "${CC_TEST_REPORTER_ID}" ]; then
   /usr/bin/python -m py.test --cov=jlib --cov-report=term-missing --profile test/
