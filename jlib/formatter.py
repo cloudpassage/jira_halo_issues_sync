@@ -57,5 +57,5 @@ class Formatter(object):
         if asset_type not in cls.supported_asset_types:
             return None
         elif asset_type == "server":
-            summary = "Halo detected a {} issue in server {}".format(issue_type, asset_described["hostname"])  # NOQA
+            summary = "Halo detected {} issue in server {}".format(issue_type, asset_described["hostname"])  # NOQA
             return summary
