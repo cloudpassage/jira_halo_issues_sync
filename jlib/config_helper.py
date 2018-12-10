@@ -68,7 +68,6 @@ class ConfigHelper(object):
                        - datetime.timedelta(minutes=(abs(5000)))).isoformat()
         self.logger = Logger()
 
-
     @classmethod
     def bool_from_env(cls, var_name):
         """Return True if env var is set to "True" or "true", else False."""
@@ -92,7 +91,6 @@ class ConfigHelper(object):
         except IndexError:
             result = {}
         return result
-
 
     @classmethod
     def int_from_env(cls, var_name):

@@ -87,6 +87,7 @@ issue will be opened.
   * Recommended: [CloudPassage Cortex](https://github.com/cloudpassage/cortex)
   * If you're not using Cortex, you need a task scheduler and a Docker engine
   to run the container.
+* Optional: Run in AWS Lambda!  See [LAMBDA.md](LAMBDA.md)
 
 ## Running (stand-alone)
 
@@ -177,6 +178,7 @@ Available Halo fields are:
 | JIRA_PROJECT_KEY         | Project key for project where all new issues will be created.                              |
 | ISSUE_REOPEN_TRANSITION  | Use this transition name for reopening Jira issues.                                        |
 | ISSUE_CLOSE_TRANSITION   | Use this transition name for closing Jira issues.                                          |
+| ISSUE_STATUS_CLOSED      | This state is considered closed, but re-openable.                                          |
 | STATUS_HARD_CLOSED       | Optional, comma-separated. If issue status matches, do not reopen, create a new issue.     |
 | JIRA_ISSUE_TYPE          | Type of issue to create (bug, story, etc...).                                              |
 | CRITICAL_ONLY            | Do not manage Jira issues for non-critical issues. (Default: False)                        |
