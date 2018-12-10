@@ -49,6 +49,6 @@ class BaseFormatter(object):
         """
 
         if sys.version_info < (3, 0):
-            return True if isinstance(sample, basestring) else False  # NOQA: F821
+            return True if isinstance(sample, basestring) else False  # NOQA
         else:
             return True if isinstance(sample, (str, bytes)) else False

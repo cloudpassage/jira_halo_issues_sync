@@ -2,7 +2,7 @@
 
 apt-get update && apt-get install -y git curl
 
-/usr/bin/python -mpip install -r /src/requirements-testing.txt
+/usr/bin/python -mpip install -r /src/jira_halo_issues_sync/requirements-testing.txt
 
 echo "Testing requires the following environment variables to be set:"
 echo "HALO_API_KEY"

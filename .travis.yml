@@ -2,13 +2,15 @@ sudo: required
 language: python
 services:
 - docker
-before_script: docker run -it --rm -e "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}" -e
+before_script:
+- docker run -it --rm -e "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}" -e
   "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}" -e "AWS_REGION=${AWS_REGION}" -e
   "ENVIRONMENT_NAME=${ENVIRONMENT_NAME}" ${TESTING_IMAGE_NAME} deprovision && docker
   run -it --rm -e "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}" -e "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}"
   -e "ENVIRONMENT_NAME=${ENVIRONMENT_NAME}" -e "AMI_ID=${AMI_ID}" -e "AWS_SSH_KEY_NAME=${AWS_SSH_KEY_NAME}"
   -e "AWS_REGION=${AWS_REGION}" -e "HALO_AGENT_KEY=${HALO_AGENT_KEY}" -e "SERVER_COUNT=${SERVER_COUNT}"
   -e "CLI_CMD=${CLI_CMD}" ${TESTING_IMAGE_NAME} provision
+- pip install aws-sam-cli
 script:
 - docker build -t testme .
 - docker run -it --rm
@@ -22,7 +24,7 @@ script:
   -e ISSUE_CLOSE_TRANSITION=${ISSUE_CLOSE_TRANSITION}
   -e ISSUE_REOPEN_TRANSITION=${ISSUE_REOPEN_TRANSITION}
   -e JIRA_ISSUE_TYPE=${JIRA_ISSUE_TYPE}
-  testme /src/run_tests.sh
+  testme /src/jira_halo_issues_sync/run_tests.sh
 - docker run -it --rm
   -e HALO_API_KEY=${HALO_API_KEY}
   -e HALO_API_SECRET_KEY=${HALO_API_SECRET_KEY}
@@ -39,9 +41,25 @@ script:
   -e DEBUG=True
   -e TIME_RANGE=60
   testme
-after_success: docker run -it --rm -e "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}" -e
+- docker run -it --rm
+  -v ${PWD}/JiraHaloIssuesSync/:/opt/
+  --entrypoint=/bin/sh
+  testme
+  /src/jira_halo_issues_sync/generate_lambda.sh
+- cp JiraHaloIssuesSync/JiraHaloIssuesSyncFunction.zip ./
+- cat ./envvars.template | envsubst > envvars.json
+- sam local invoke
+  --debug
+  --region=us-west-2
+  --no-event
+  --env-vars ./envvars.json
+  --parameter-overrides='ParameterKey=CodeUriParameter,ParameterValue=JiraHaloIssuesSyncFunction.zip'
+  JiraHaloIssuesSyncFunction
+after_success:
+- docker run -it --rm -e "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}" -e
   "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}" -e "AWS_REGION=${AWS_REGION}" -e
   "ENVIRONMENT_NAME=${ENVIRONMENT_NAME}" ${TESTING_IMAGE_NAME} deprovision
+- python ./cleanup.py
 after_failure: docker run -it --rm -e "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}" -e
   "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}" -e "AWS_REGION=${AWS_REGION}" -e
   "ENVIRONMENT_NAME=${ENVIRONMENT_NAME}" ${TESTING_IMAGE_NAME} deprovision

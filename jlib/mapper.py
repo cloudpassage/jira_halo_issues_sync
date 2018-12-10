@@ -8,7 +8,6 @@ class Mapper(object):
         result.update(dyn_mapped)
         return result
 
-
     @classmethod
     def get_dynamic_mapping(cls, dyn_mapping, asset, issue):
         retval = {}
