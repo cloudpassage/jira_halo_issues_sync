@@ -12,7 +12,6 @@ class FormatterFindingSVA(BaseFormatter):
                              for x in finding["cve_entries"]])
         return result
 
-
     @classmethod
     def format_cve_entry(cls, entry):
         """Return CVE entry formatted for Jira."""

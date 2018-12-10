@@ -1,6 +1,10 @@
 #!/usr/bin/python2
+import boto3
 import jlib
+import json
+import os
 import sys
+from base64 import b64decode
 
 
 def main():
@@ -22,7 +26,6 @@ def main():
                                      config.issue_close_transition,
                                      config.issue_status_hard_closed,
                                      config.issue_reopen_transition)
-    formatter = jlib.Formatter()
     reconciler = jlib.Reconciler(halo, jira, config.jira_field_mapping,
                                  config.jira_field_static)
 
@@ -41,7 +44,7 @@ def main():
         jira_related = jira.get_jira_issues_for_halo_issue(x["id"])
         marching_orders[issue_id] = {"halo": x, "jira": jira_related}
     for x in marching_orders.keys():
-        marching_orders[x]["disposition"] = determinator.get_disposition(marching_orders[x]["halo"], marching_orders[x]["jira"])
+        marching_orders[x]["disposition"] = determinator.get_disposition(marching_orders[x]["halo"], marching_orders[x]["jira"])  # NOQA
 
     # Reconcile.
     for issue_id, other in marching_orders.items():
@@ -49,18 +52,39 @@ def main():
         if action == "create":
             msg = "Creating Jira issue for Halo issue ID {}".format(issue_id)
         elif action == "create_closed":
-            msg = "Creating and closing Jira issue for Halo issue ID {}".format(issue_id)
+            msg = "Creating and closing Jira issue for Halo issue ID {}".format(issue_id)  # NOQA
         elif action == "comment":
             msg = "Commenting Jira issue for Halo issue ID {}".format(issue_id)
         elif action == "change_status":
-            msg = "Transitioning Jira issue for Halo issue ID {}".format(issue_id)
+            msg = "Transitioning Jira issue for Halo issue ID {}".format(issue_id)  # NOQA
         elif action == "nothing":
             logger.info("Nothing to do for Halo issue ID {}".format(issue_id))
             continue
         logger.info(msg)
         reconciler.reconcile(other["disposition"], other["halo"])
     logger.info("Done!")
+    return {"result": json.dumps(
+                {"message": "Halo/Jira issue sync complete",
+                 "total_issues": len(marching_orders.items())})}
 
+
+def lambda_handler(event, context):
+    """We expect credentials to be encrypted if we're running in Lambda."""
+    logger = jlib.Logger()
+    kms = boto3.client('kms')
+    encrypted_vars = ["HALO_API_KEY", "HALO_API_SECRET_KEY",
+                      "JIRA_API_USER", "JIRA_API_TOKEN"]
+    for encrypted_var in encrypted_vars:
+        try:
+            encrypted_value = os.getenv(encrypted_var)
+            decrypted_value = kms.decrypt(CiphertextBlob=b64decode(encrypted_value))['Plaintext']  # NOQA
+            os.environ[encrypted_var] = decrypted_value
+            msg = "Set var {} to decrypted value with length {}".format(encrypted_var, len(decrypted_value))  # NOQA
+            logger.warn(msg)
+        except (kms.exceptions.InvalidCiphertextException, TypeError) as e:
+            msg = "Error decrypting {} with KMS, will try plaintext: {}".format(encrypted_var, e)  # NOQA
+            logger.error(msg)
+    return main()
 
 
 if __name__ == "__main__":
