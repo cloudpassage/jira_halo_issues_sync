@@ -65,7 +65,7 @@ class TestUnitConfigHelper:
         monkeypatch.setenv("test_env", "hello")
         canary = "alive"
         with pytest.raises(ValueError):
-            result = jlib.ConfigHelper.int_from_env("test_env")
+            jlib.ConfigHelper.int_from_env("test_env")
             canary = "dead"
         assert canary == "alive"
         return

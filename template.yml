@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Synchronize Halo issues with Jira issues.
+Globals:
+  Function:
+    Environment:
+      Variables:
+        HALO_API_HOSTNAME: api.cloudpassage.com
+        JIRA_API_URL: https://jira.example.com
+        TIME_RANGE: "60"
+        JIRA_ISSUE_ID_FIELD: issueid
+        JIRA_PROJECT_KEY: MYPROJ
+        ISSUE_REOPEN_TRANSITION: reopen
+        ISSUE_CLOSE_TRANSITION: close
+        JIRA_ISSUE_TYPE: Bug
+        CRITICAL_ONLY: "True"
+        ISSUE_STATUS_CLOSED: closed
+        HALO_API_KEY: NONE
+        HALO_API_SECRET_KEY: NONE
+        JIRA_API_USER: "NONE"
+        JIRA_API_TOKEN: NONE
+
+Parameters:
+  CodeUriParameter:
+    Type: String
+    Default: "jira_halo_issues_sync/"
+Resources:
+    JiraHaloIssuesSyncFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: JiraHaloIssuesSyncFunction
+            CodeUri:
+              Ref: CodeUriParameter
+            Handler: application.lambda_handler
+            Runtime: python2.7
+            Timeout: 240

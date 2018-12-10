@@ -2,8 +2,8 @@ import cloudpassage
 import os
 from logger import Logger
 import re
-import sys
 from multiprocessing.dummy import Pool as ThreadPool
+
 
 class Halo(object):
     def __init__(self, key, secret, api_host):
@@ -16,8 +16,8 @@ class Halo(object):
         """
         self.logger = Logger()
         integration = self.get_integration_string()
-        self.session = cloudpassage.HaloSession(key, secret, api_host=api_host,  # NOQA
-                                                 integration_string=integration)  # NOQA
+        self.session = cloudpassage.HaloSession(key, secret, api_host=api_host,
+                                                integration_string=integration)
         self.issues = cloudpassage.Issue(self.session)
         self.http_helper = cloudpassage.HttpHelper(self.session)
         try:
@@ -68,10 +68,10 @@ class Halo(object):
         """Wrap functionality to get findings for scan and event findings."""
         if "/scans/" in finding_url:
             scan_id, finding_id = self.parse_finding_url(finding_url)
-            result =  self.get_finding(scan_id, finding_id)
+            result = self.get_finding(scan_id, finding_id)
         elif "/events/" in finding_url:
             event_id = finding_url.split('/')[-1]
-            h_h = cloudpassage.http_helper(session)
+            h_h = cloudpassage.http_helper(self.session)
             result = h_h.get("/v1/events/{}".format(event_id))
         else:
             msg = "Unable to determine finding type: {}".format(finding_url)
@@ -104,11 +104,11 @@ class Halo(object):
             dict
         """
         if not critical_only:
-            return self.issues.list_all(status=["active","resolved"],
+            return self.issues.list_all(status=["active", "resolved"],
                                         state=["active", "inactive",
                                                "missing", "retired"],
                                         updated_at_gte=timestamp)
-        return self.issues.list_all(status=["active","resolved"],
+        return self.issues.list_all(status=["active", "resolved"],
                                     state=["active", "inactive",
                                            "missing", "retired"],
                                     critical="true", updated_at_gte=timestamp)
@@ -132,12 +132,12 @@ class Halo(object):
         Returns:
             tuple (scan_id, finding_id) or None, if no match.
         """
-        rx = "^https://\w+\.cloudpassage\.com/v\d/scans/[A-Za-z0-9]+/findings/[A-Za-z0-9]+$"
+        rx = r"^https://\w+\.cloudpassage\.com/v\d/scans/[A-Za-z0-9]+/findings/[A-Za-z0-9]+$"  # NOQA
         if not re.match(rx, url):
             self.logger.error("Unable to parse finding URL: {}".format(url))
             return None
         else:
-            rxtractor = ".*/scans/(?P<scan_id>[A-Za-z0-9]+)/findings/(?P<finding_id>[A-Za-z0-9]+)"
+            rxtractor = r".*/scans/(?P<scan_id>[A-Za-z0-9]+)/findings/(?P<finding_id>[A-Za-z0-9]+)"  # NOQA
             result = re.search(rxtractor, url)
             scan_id, finding_id = (result.group("scan_id"),
                                    result.group("finding_id"))
