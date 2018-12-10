@@ -103,7 +103,7 @@ class Halo(object):
         Returns:
             dict
         """
-        if critical_only is False:
+        if not critical_only:
             return self.issues.list_all(status=["active", "resolved"],
                                         state=["active", "inactive",
                                                "missing", "retired"],
@@ -132,12 +132,12 @@ class Halo(object):
         Returns:
             tuple (scan_id, finding_id) or None, if no match.
         """
-        rx = "^https://\w+\.cloudpassage\.com/v\d/scans/[A-Za-z0-9]+/findings/[A-Za-z0-9]+$"  # NOQA
+        rx = r"^https://\w+\.cloudpassage\.com/v\d/scans/[A-Za-z0-9]+/findings/[A-Za-z0-9]+$"  # NOQA
         if not re.match(rx, url):
             self.logger.error("Unable to parse finding URL: {}".format(url))
             return None
         else:
-            rxtractor = ".*/scans/(?P<scan_id>[A-Za-z0-9]+)/findings/(?P<finding_id>[A-Za-z0-9]+)"  # NOQA
+            rxtractor = r".*/scans/(?P<scan_id>[A-Za-z0-9]+)/findings/(?P<finding_id>[A-Za-z0-9]+)"  # NOQA
             result = re.search(rxtractor, url)
             scan_id, finding_id = (result.group("scan_id"),
                                    result.group("finding_id"))
