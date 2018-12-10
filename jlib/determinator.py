@@ -43,11 +43,11 @@ class Determinator(object):
 
         Instructions reference:
             create: None
-            create_closed: {'target_status': 'status_name',
-                            'jira_id': 'ticket_id'}
+            create_closed:
+                {'target_status': 'status_name', 'jira_id': 'ticket_id'}
             comment: {'jira_id': 'ticket_id'}
-            change_status: {'target_status': 'status_name',
-                            'jira_id': 'ticket_id'}
+            change_status:
+                {'target_status': 'status_name', 'jira_id': 'ticket_id'}
             nothing: None
 
         """
@@ -62,16 +62,19 @@ class Determinator(object):
             result = ("create", None)
         elif self.create_closed(halo_issue, jira_tickets):
             msg = "Create closed issue for {}".format(halo_issue["id"])
-            result = ("create_closed", self.get_transition_instructions("close", jira_tickets))  # NOQA
+            result = ("create_closed",
+                      self.get_transition_instructions("close", jira_tickets))
         elif self.close(halo_issue, jira_tickets):
             msg = "Close issue for {}".format(halo_issue["id"])
-            result = ("change_status", self.get_transition_instructions("close", jira_tickets))  # NOQA
+            result = ("change_status",
+                      self.get_transition_instructions("close", jira_tickets))
         elif self.comment(halo_issue, jira_tickets):
             msg = "Comment issue {}".format(halo_issue["id"])
             result = ("comment", self.comment_instructions(jira_tickets))
         elif self.reopen(halo_issue, jira_tickets):
             msg = "Reopen issue for {}".format(halo_issue["id"])
-            result = ("change_status", self.get_transition_instructions("reopen", jira_tickets))  # NOQA
+            result = ("change_status",
+                      self.get_transition_instructions("reopen", jira_tickets))
         else:
             i_id = halo_issue["id"]
             msg = "ERROR: Halo issue {} passed through determinator.".format(i_id)  # NOQA
@@ -99,8 +102,7 @@ class Determinator(object):
 
     def create(self, halo_issue, jira_tickets):
         """Return True if Halo issue is active and no Jira tickets exist."""
-        useable_jira_tix = [x for x in jira_tickets
-                            if x.fields.status.name != self.issue_status_hard_closed]  # NOQA
+        useable_jira_tix = [x for x in jira_tickets if x.fields.status.name != self.issue_status_hard_closed]  # NOQA
         if halo_issue["status"] == "active" and not useable_jira_tix:
             return True
 
@@ -129,7 +131,7 @@ class Determinator(object):
             return True
 
     def reopen(self, halo_issue, jira_tickets):
-        """Return True if Halo issue is active and Jira issue is reopenable."""
+        """Return True if Halo issue is active and Jira ticket is reopenable"""
         reopenable_tix = [x for x in jira_tickets
                           if x.fields.status.name == self.issue_status_closed]
         if halo_issue["status"] == "active" and reopenable_tix:
