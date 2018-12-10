@@ -7,7 +7,7 @@ Build the container image and run the lambda packaging script:
 ```
 docker build -t jira_halo_issues_sync . && \
 docker run \
-    -v /tmp/JiraHaloIssuesSync/:/opt/ \
+    -v /tmp/JiraHaloIssuesSync/:/var/delivery/ \
     --entrypoint=/bin/sh  \
     jira_halo_issues_sync \
     /src/jira_halo_issues_sync/generate_lambda.sh

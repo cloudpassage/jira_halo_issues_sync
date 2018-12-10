@@ -36,9 +36,9 @@ sam build -b /opt/ --debug --region=us-west-2
 cd /opt/JiraHaloIssuesSyncFunction/
 zip -r /src/JiraHaloIssuesSyncFunction.zip ./*
 rm -rf /opt/*
-mv /src/JiraHaloIssuesSyncFunction.zip /opt/
-echo "/opt/ contents:"
-ls /opt
+mv /src/JiraHaloIssuesSyncFunction.zip /var/delivery/
+echo "/var/delivery/ contents:"
+ls /var/delivery
 echo "/src/ contents:"
 ls /src
 
