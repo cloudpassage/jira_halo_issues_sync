@@ -18,7 +18,7 @@ class TestIntegrationMapper:
                    "issue_type": "jirafield_issue_type"}
         static = {"jira_field_1": "halo_field_1"}
         asset = self.get_json_from_file("server.json")
-        issue = self.get_json_from_file("server_fim_issue_created_describe.json")
+        issue = self.get_json_from_file("server_fim_issue_created_describe.json")  # NOQA
         result = jlib.Mapper.map_fields(dynamic, static, asset, issue)
         print(result)
         assert result["jira_field_1"] == "halo_field_1"
@@ -31,7 +31,7 @@ class TestIntegrationMapper:
         static = {"jira_field_1": "halo_field_1"}
         asset = self.get_json_from_file("server.json")
         del asset["hostname"]
-        issue = self.get_json_from_file("server_fim_issue_created_describe.json")
+        issue = self.get_json_from_file("server_fim_issue_created_describe.json")  # NOQA
         result = jlib.Mapper.map_fields(dynamic, static, asset, issue)
         print(result)
         assert result["jira_field_1"] == "halo_field_1"
@@ -43,7 +43,7 @@ class TestIntegrationMapper:
                    "issue_type_nonexist": "jirafield_issue_type"}
         static = {"jira_field_1": "halo_field_1"}
         asset = self.get_json_from_file("server.json")
-        issue = self.get_json_from_file("server_fim_issue_created_describe.json")
+        issue = self.get_json_from_file("server_fim_issue_created_describe.json")  # NOQA
         result = jlib.Mapper.map_fields(dynamic, static, asset, issue)
         print(result)
         assert result["jira_field_1"] == "halo_field_1"

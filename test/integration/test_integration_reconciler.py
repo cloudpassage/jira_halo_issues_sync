@@ -1,12 +1,8 @@
-import cloudpassage
 import jlib
 import os
-import pytest
-import pprint
-from datetime import datetime, timedelta
 
 
-class TestIntegrationHalo:
+class TestIntegrationReconciler:
     def get_halo_object(self):
         key = os.getenv("HALO_API_KEY")
         secret = os.getenv("HALO_API_SECRET_KEY")
@@ -34,20 +30,28 @@ class TestIntegrationHalo:
 
     def test_reconcile_create_comment_transition(self):
         reconciler = self.get_reconciler_object()
-        target_issue_id = reconciler.halo.issues.list_all(status=["active","resolved"],
-                                                         state=["active", "inactive",
-                                                         "missing", "retired"])[0]["id"]
-        full_issue = reconciler.halo.get_issue_full(target_issue_id)
+        target_issue = reconciler.halo.issues.list_all(status=["active",
+                                                               "resolved"],
+                                                       state=["active",
+                                                              "inactive",
+                                                              "missing",
+                                                              "retired"])
+        full_issue = reconciler.halo.get_issue_full(target_issue[0]["id"])
         issue_key = reconciler.create(full_issue)
         reconciler.comment(full_issue, issue_key)
-        reconciler.change_status(issue_key, os.getenv("ISSUE_CLOSE_TRANSITION"))
+        reconciler.change_status(issue_key,
+                                 os.getenv("ISSUE_CLOSE_TRANSITION"))
         assert issue_key
 
     def test_reconcile_create_closed(self):
         reconciler = self.get_reconciler_object()
-        target_issue_id = reconciler.halo.issues.list_all(status=["active","resolved"],
-                                                         state=["active", "inactive",
-                                                         "missing", "retired"])[0]["id"]
-        full_issue = reconciler.halo.get_issue_full(target_issue_id)
-        reconciler.create_closed(full_issue, os.getenv("ISSUE_CLOSE_TRANSITION"))
+        target_issue = reconciler.halo.issues.list_all(status=["active",
+                                                               "resolved"],
+                                                       state=["active",
+                                                              "inactive",
+                                                              "missing",
+                                                              "retired"])
+        full_issue = reconciler.halo.get_issue_full(target_issue[0]["id"])
+        reconciler.create_closed(full_issue,
+                                 os.getenv("ISSUE_CLOSE_TRANSITION"))
         assert True
