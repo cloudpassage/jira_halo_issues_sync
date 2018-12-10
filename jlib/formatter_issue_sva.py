@@ -5,4 +5,6 @@ class FormatterIssueSVA(BaseFormatter):
     """Format SVA issue json for Jira."""
     @classmethod
     def format_header(cls, issue_json):
-        return "h2. Vulnerable software package: {}\n".format(issue_json["name"])  # NOQA
+        pkg_name = issue_json["name"]
+        hdr = "h2. Vulnerable software package: {}\n".format(pkg_name)
+        return hdr

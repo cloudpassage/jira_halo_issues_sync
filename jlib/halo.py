@@ -16,8 +16,8 @@ class Halo(object):
         """
         self.logger = Logger()
         integration = self.get_integration_string()
-        self.session = cloudpassage.HaloSession(key, secret, api_host=api_host,  # NOQA
-                                                 integration_string=integration)  # NOQA
+        self.session = cloudpassage.HaloSession(key, secret, api_host=api_host,
+                                                integration_string=integration)
         self.issues = cloudpassage.Issue(self.session)
         self.http_helper = cloudpassage.HttpHelper(self.session)
         try:
