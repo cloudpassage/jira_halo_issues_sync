@@ -42,7 +42,7 @@ script:
   -e TIME_RANGE=60
   testme
 - docker run -it --rm
-  -v ${PWD}/JiraHaloIssuesSync/:/opt/
+  -v ${PWD}/JiraHaloIssuesSync/:/var/delivery/
   --entrypoint=/bin/sh
   testme
   /src/jira_halo_issues_sync/generate_lambda.sh
