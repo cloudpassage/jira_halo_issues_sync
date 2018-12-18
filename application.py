@@ -18,13 +18,6 @@ def main():
     # Create objects we'll interact with later
     halo = jlib.Halo(config.halo_api_key, config.halo_api_secret_key,
                      config.halo_api_hostname)
-    jira = jlib.JiraLocal(config.jira_api_url, config.jira_api_user,
-                          config.jira_api_token,
-                          config.jira_issue_id_field,
-                          config.jira_project_key,
-                          config.jira_issue_type)
-    reconciler = jlib.Reconciler(halo, jira, config.jira_field_mapping,
-                                 config.jira_field_static)
 
     # Get issues created, changed, deleted since starting timestamp
     msg = "Getting all Halo issues from the last {} minutes".format(config.time_range)  # NOQA
@@ -38,25 +31,52 @@ def main():
     marching_orders = get_marching_orders(config, halo_issues)
 
     # Reconcile.
-    for issue_id, other in marching_orders.items():
-        action = other["disposition"][0]
-        if action == "create":
-            msg = "Creating Jira issue for Halo issue ID {}".format(issue_id)
-        elif action == "create_closed":
-            msg = "Creating and closing Jira issue for Halo issue ID {}".format(issue_id)  # NOQA
-        elif action == "comment":
-            msg = "Commenting Jira issue for Halo issue ID {}".format(issue_id)
-        elif action == "change_status":
-            msg = "Transitioning Jira issue for Halo issue ID {}".format(issue_id)  # NOQA
-        elif action == "nothing":
-            logger.info("Nothing to do for Halo issue ID {}".format(issue_id))
-            continue
-        logger.info(msg)
-        reconciler.reconcile(other["disposition"], other["halo"])
+    reconcile_marching_orders(config, marching_orders)
+
+    # for issue_id, other in marching_orders.items():
+
     logger.info("Done!")
     return {"result": json.dumps(
                 {"message": "Halo/Jira issue sync complete",
                  "total_issues": len(marching_orders.items())})}
+
+
+def reconcile_marching_orders(config, marching_orders):
+    packed_list = [(config, x) for x in marching_orders.items()]
+    reconciler_helper = reconcile_issue
+    pool = ThreadPool(7)
+    pool.map(reconciler_helper, packed_list)
+    pool.close()
+    pool.join()
+    return
+
+
+def reconcile_issue(reconcile_bundle):
+    config, item = reconcile_bundle
+    issue_id, other = item
+    logger = jlib.Logger()
+    halo = jlib.Halo(config.halo_api_key, config.halo_api_secret_key,
+                     config.halo_api_hostname)
+    jira = jlib.JiraLocal(config.jira_api_url, config.jira_api_user,
+                          config.jira_api_token,
+                          config.jira_issue_id_field,
+                          config.jira_project_key,
+                          config.jira_issue_type)
+    reconciler = jlib.Reconciler(halo, jira, config.jira_field_mapping,
+                                 config.jira_field_static)
+    action = other["disposition"][0]
+    if action == "create":
+        msg = "Creating Jira issue for Halo issue ID {}".format(issue_id)
+    elif action == "create_closed":
+        msg = "Creating and closing Jira issue for Halo issue ID {}".format(issue_id)  # NOQA
+    elif action == "comment":
+        msg = "Commenting Jira issue for Halo issue ID {}".format(issue_id)
+    elif action == "change_status":
+        msg = "Transitioning Jira issue for Halo issue ID {}".format(issue_id)  # NOQA
+    elif action == "nothing":
+        logger.info("Nothing to do for Halo issue ID {}".format(issue_id))
+    logger.info(msg)
+    reconciler.reconcile(other["disposition"], other["halo"])
 
 
 def get_marching_orders(config, issue_list):
