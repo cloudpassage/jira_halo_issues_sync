@@ -34,7 +34,7 @@ class TestIntegrationDetermaintor:
         test_halo = self.generate_halo_server_issue_meta("csm", "created")
         test_halo["issue_type"] = "automotive"
         test_jira = []
-        determinator = jlib.Determinator("closed", "hard_closed", "close",
+        determinator = jlib.Determinator("closed", "close", "hard_closed",
                                          "reopened")
         determination = determinator.get_disposition(test_halo, test_jira)
         assert determination == ("nothing", None)
@@ -42,7 +42,7 @@ class TestIntegrationDetermaintor:
     def test_integration_determinator_get_disposition_create_csm(self):
         test_halo = self.generate_halo_server_issue_meta("csm", "created")
         test_jira = []
-        determinator = jlib.Determinator("closed", "hard_closed", "close",
+        determinator = jlib.Determinator("closed", "close", "hard_closed",
                                          "reopened")
         determination = determinator.get_disposition(test_halo, test_jira)
         assert determination == ("create", None)
@@ -50,7 +50,7 @@ class TestIntegrationDetermaintor:
     def test_integration_determinator_get_disposition_create_fim(self):
         test_halo = self.generate_halo_server_issue_meta("fim", "created")
         test_jira = []
-        determinator = jlib.Determinator("closed", "hard_closed", "close",
+        determinator = jlib.Determinator("closed", "close", "hard_closed",
                                          "reopened")
         determination = determinator.get_disposition(test_halo, test_jira)
         assert determination == ("create", None)
@@ -58,7 +58,7 @@ class TestIntegrationDetermaintor:
     def test_integration_determinator_get_disposition_create_lids(self):
         test_halo = self.generate_halo_server_issue_meta("lids", "created")
         test_jira = []
-        determinator = jlib.Determinator("closed", "hard_closed", "close",
+        determinator = jlib.Determinator("closed", "close", "hard_closed",
                                          "reopened")
         determination = determinator.get_disposition(test_halo, test_jira)
         assert determination == ("create", None)
@@ -66,7 +66,7 @@ class TestIntegrationDetermaintor:
     def test_integration_determinator_get_disposition_create_sva(self):
         test_halo = self.generate_halo_server_issue_meta("sva", "created")
         test_jira = []
-        determinator = jlib.Determinator("closed", "hard_closed", "close",
+        determinator = jlib.Determinator("closed", "close", "hard_closed",
                                          "reopened")
         determination = determinator.get_disposition(test_halo, test_jira)
         assert determination == ("create", None)
@@ -74,7 +74,7 @@ class TestIntegrationDetermaintor:
     def test_integration_determinator_get_disposition_close_csm(self):
         test_halo = self.generate_halo_server_issue_meta("csm", "resolved")
         test_jira = [self.generate_jira_issue("open")]
-        determinator = jlib.Determinator("closed", "hard_closed", "close",
+        determinator = jlib.Determinator("closed", "close", "hard_closed",
                                          "reopened")
         determination = determinator.get_disposition(test_halo, test_jira)
         assert determination == ("change_status", {'transition': 'close',
@@ -83,7 +83,7 @@ class TestIntegrationDetermaintor:
     def test_integration_determinator_get_disposition_close_fim(self):
         test_halo = self.generate_halo_server_issue_meta("fim", "resolved")
         test_jira = [self.generate_jira_issue("open")]
-        determinator = jlib.Determinator("closed", "hard_closed", "close",
+        determinator = jlib.Determinator("closed", "close", "hard_closed",
                                          "reopened")
         determination = determinator.get_disposition(test_halo, test_jira)
         assert determination == ("change_status", {'transition': 'close',
@@ -92,7 +92,7 @@ class TestIntegrationDetermaintor:
     def test_integration_determinator_get_disposition_close_lids(self):
         test_halo = self.generate_halo_server_issue_meta("lids", "resolved")
         test_jira = [self.generate_jira_issue("open")]
-        determinator = jlib.Determinator("closed", "hard_closed", "close",
+        determinator = jlib.Determinator("closed", "close", "hard_closed",
                                          "reopened")
         determination = determinator.get_disposition(test_halo, test_jira)
         assert determination == ("change_status", {'transition': 'close',
@@ -101,7 +101,7 @@ class TestIntegrationDetermaintor:
     def test_integration_determinator_get_disposition_close_sva(self):
         test_halo = self.generate_halo_server_issue_meta("sva", "resolved")
         test_jira = [self.generate_jira_issue("open")]
-        determinator = jlib.Determinator("closed", "hard_closed", "close",
+        determinator = jlib.Determinator("closed", "close", "hard_closed",
                                          "reopened")
         determination = determinator.get_disposition(test_halo, test_jira)
         assert determination == ("change_status", {'transition': 'close',
@@ -110,7 +110,7 @@ class TestIntegrationDetermaintor:
     def test_integration_determinator_get_disposition_comment_csm(self):
         test_halo = self.generate_halo_server_issue_meta("csm", "created")
         test_jira = [self.generate_jira_issue("open")]
-        determinator = jlib.Determinator("closed", "hard_closed", "close",
+        determinator = jlib.Determinator("closed", "close", "hard_closed",
                                          "reopened")
         determination = determinator.get_disposition(test_halo, test_jira)
         assert determination == ("comment", {'jira_id': 'AB-263'})
@@ -118,7 +118,7 @@ class TestIntegrationDetermaintor:
     def test_integration_determinator_get_disposition_comment_fim(self):
         test_halo = self.generate_halo_server_issue_meta("fim", "created")
         test_jira = [self.generate_jira_issue("open")]
-        determinator = jlib.Determinator("closed", "hard_closed", "close",
+        determinator = jlib.Determinator("closed", "close", "hard_closed",
                                          "reopened")
         determination = determinator.get_disposition(test_halo, test_jira)
         assert determination == ("comment", {'jira_id': 'AB-263'})
@@ -126,7 +126,7 @@ class TestIntegrationDetermaintor:
     def test_integration_determinator_get_disposition_comment_lids(self):
         test_halo = self.generate_halo_server_issue_meta("lids", "created")
         test_jira = [self.generate_jira_issue("open")]
-        determinator = jlib.Determinator("closed", "hard_closed", "close",
+        determinator = jlib.Determinator("closed", "close", "hard_closed",
                                          "reopened")
         determination = determinator.get_disposition(test_halo, test_jira)
         assert determination == ("comment", {'jira_id': 'AB-263'})
@@ -134,7 +134,7 @@ class TestIntegrationDetermaintor:
     def test_integration_determinator_get_disposition_comment_sva(self):
         test_halo = self.generate_halo_server_issue_meta("sva", "created")
         test_jira = [self.generate_jira_issue("open")]
-        determinator = jlib.Determinator("closed", "hard_closed", "close",
+        determinator = jlib.Determinator("closed", "close", "hard_closed",
                                          "reopened")
         determination = determinator.get_disposition(test_halo, test_jira)
         assert determination == ("comment", {'jira_id': 'AB-263'})
@@ -142,7 +142,7 @@ class TestIntegrationDetermaintor:
     def test_integration_determinator_get_disposition_create_closed_csm(self):
         test_halo = self.generate_halo_server_issue_meta("csm", "resolved")
         test_jira = [self.generate_jira_issue("hard_closed")]
-        determinator = jlib.Determinator("closed", "hard_closed", "close",
+        determinator = jlib.Determinator("closed", "close", "hard_closed",
                                          "reopened")
         determination = determinator.get_disposition(test_halo, test_jira)
         assert determination[0] == "create_closed"
@@ -151,7 +151,7 @@ class TestIntegrationDetermaintor:
     def test_integration_determinator_get_disposition_create_closed_fim(self):
         test_halo = self.generate_halo_server_issue_meta("fim", "resolved")
         test_jira = [self.generate_jira_issue("hard_closed")]
-        determinator = jlib.Determinator("closed", "hard_closed", "close",
+        determinator = jlib.Determinator("closed", "close", "hard_closed",
                                          "reopened")
         determination = determinator.get_disposition(test_halo, test_jira)
         assert determination[0] == "create_closed"
@@ -160,7 +160,7 @@ class TestIntegrationDetermaintor:
     def test_integration_determinator_get_disposition_create_closed_lids(self):
         test_halo = self.generate_halo_server_issue_meta("lids", "resolved")
         test_jira = [self.generate_jira_issue("hard_closed")]
-        determinator = jlib.Determinator("closed", "hard_closed", "close",
+        determinator = jlib.Determinator("closed", "close", "hard_closed",
                                          "reopened")
         determination = determinator.get_disposition(test_halo, test_jira)
         assert determination[0] == "create_closed"
@@ -169,7 +169,7 @@ class TestIntegrationDetermaintor:
     def test_integration_determinator_get_disposition_create_closed_sva(self):
         test_halo = self.generate_halo_server_issue_meta("sva", "resolved")
         test_jira = [self.generate_jira_issue("hard_closed")]
-        determinator = jlib.Determinator("closed", "hard_closed", "close",
+        determinator = jlib.Determinator("closed", "close", "hard_closed",
                                          "reopened")
         determination = determinator.get_disposition(test_halo, test_jira)
         assert determination[0] == "create_closed"
@@ -178,7 +178,7 @@ class TestIntegrationDetermaintor:
     def test_integration_determinator_get_disposition_reticket_csm(self):
         test_halo = self.generate_halo_server_issue_meta("csm", "created")
         test_jira = [self.generate_jira_issue("hard_closed")]
-        determinator = jlib.Determinator("closed", "hard_closed", "close",
+        determinator = jlib.Determinator("closed", "close", "hard_closed",
                                          "reopened")
         determination = determinator.get_disposition(test_halo, test_jira)
         assert determination == ("create", None)
@@ -186,7 +186,7 @@ class TestIntegrationDetermaintor:
     def test_integration_determinator_get_disposition_reticket_fim(self):
         test_halo = self.generate_halo_server_issue_meta("fim", "created")
         test_jira = [self.generate_jira_issue("hard_closed")]
-        determinator = jlib.Determinator("closed", "hard_closed", "close",
+        determinator = jlib.Determinator("closed", "close", "hard_closed",
                                          "reopened")
         determination = determinator.get_disposition(test_halo, test_jira)
         assert determination == ("create", None)
@@ -194,7 +194,7 @@ class TestIntegrationDetermaintor:
     def test_integration_determinator_get_disposition_reticket_lids(self):
         test_halo = self.generate_halo_server_issue_meta("lids", "created")
         test_jira = [self.generate_jira_issue("hard_closed")]
-        determinator = jlib.Determinator("closed", "hard_closed", "close",
+        determinator = jlib.Determinator("closed", "close", "hard_closed",
                                          "reopened")
         determination = determinator.get_disposition(test_halo, test_jira)
         assert determination == ("create", None)
@@ -202,7 +202,7 @@ class TestIntegrationDetermaintor:
     def test_integration_determinator_get_disposition_reticket_sva(self):
         test_halo = self.generate_halo_server_issue_meta("sva", "created")
         test_jira = [self.generate_jira_issue("hard_closed")]
-        determinator = jlib.Determinator("closed", "hard_closed", "close",
+        determinator = jlib.Determinator("closed", "close", "hard_closed",
                                          "reopened")
         determination = determinator.get_disposition(test_halo, test_jira)
         assert determination == ("create", None)
@@ -210,7 +210,7 @@ class TestIntegrationDetermaintor:
     def test_integration_determinator_get_disposition_reopen_csm(self):
         test_halo = self.generate_halo_server_issue_meta("csm", "created")
         test_jira = [self.generate_jira_issue("closed")]
-        determinator = jlib.Determinator("closed", "hard_closed", "close",
+        determinator = jlib.Determinator("closed", "close", "hard_closed",
                                          "reopened")
         determination = determinator.get_disposition(test_halo, test_jira)
         assert determination == ("change_status", {'transition': 'reopened',
@@ -219,7 +219,7 @@ class TestIntegrationDetermaintor:
     def test_integration_determinator_get_disposition_reopen_fim(self):
         test_halo = self.generate_halo_server_issue_meta("fim", "created")
         test_jira = [self.generate_jira_issue("closed")]
-        determinator = jlib.Determinator("closed", "hard_closed", "close",
+        determinator = jlib.Determinator("closed", "close", "hard_closed",
                                          "reopened")
         determination = determinator.get_disposition(test_halo, test_jira)
         assert determination == ("change_status", {'transition': 'reopened',
@@ -228,7 +228,7 @@ class TestIntegrationDetermaintor:
     def test_integration_determinator_get_disposition_reopen_lids(self):
         test_halo = self.generate_halo_server_issue_meta("lids", "created")
         test_jira = [self.generate_jira_issue("closed")]
-        determinator = jlib.Determinator("closed", "hard_closed", "close",
+        determinator = jlib.Determinator("closed", "close", "hard_closed",
                                          "reopened")
         determination = determinator.get_disposition(test_halo, test_jira)
         assert determination == ("change_status", {'transition': 'reopened',
@@ -237,7 +237,7 @@ class TestIntegrationDetermaintor:
     def test_integration_determinator_get_disposition_reopen_sva(self):
         test_halo = self.generate_halo_server_issue_meta("sva", "created")
         test_jira = [self.generate_jira_issue("closed")]
-        determinator = jlib.Determinator("closed", "hard_closed", "close",
+        determinator = jlib.Determinator("closed", "close", "hard_closed",
                                          "reopened")
         determination = determinator.get_disposition(test_halo, test_jira)
         assert determination == ("change_status", {'transition': 'reopened',

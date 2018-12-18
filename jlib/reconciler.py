@@ -36,6 +36,8 @@ class Reconciler(object):
         message = "Halo ID: {}\tModule: {}\tAction: {}".format(issue_id,
                                                                module, action)
         self.logger.info(message)
+        self.logger.debug("Action: {}\tInstructions: {}".format(action,
+                                                                instructions))
         if action not in self.supported_actions:
             msg = "Unsupported action for {}: {}".format(issue_meta["id"],
                                                          action)
@@ -44,11 +46,12 @@ class Reconciler(object):
         elif action == "create":
             self.create(issue_meta)
         elif action == "create_closed":
-            self.create_closed(issue_meta, instructions)
+            self.create_closed(issue_meta, instructions["transition"])
         elif action == "comment":
             self.comment(issue_meta, instructions["jira_id"])
         elif action == "change_status":
-            self.change_status(issue_meta, instructions)
+            self.change_status(instructions["jira_id"],
+                               instructions["transition"])
         return
 
     def create(self, issue_described):
