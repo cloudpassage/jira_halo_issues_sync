@@ -5,6 +5,7 @@ import json
 import os
 import sys
 from base64 import b64decode
+from multiprocessing.dummy import Pool as ThreadPool
 
 
 def main():
@@ -22,10 +23,6 @@ def main():
                           config.jira_issue_id_field,
                           config.jira_project_key,
                           config.jira_issue_type)
-    determinator = jlib.Determinator(config.issue_status_closed,
-                                     config.issue_close_transition,
-                                     config.issue_status_hard_closed,
-                                     config.issue_reopen_transition)
     reconciler = jlib.Reconciler(halo, jira, config.jira_field_mapping,
                                  config.jira_field_static)
 
@@ -38,13 +35,7 @@ def main():
     # what should be created, updated, closed, or reopened.
     msg = "Getting Jira issues which correspond to Halo issues."
     logger.info(msg)
-    marching_orders = {}
-    for x in halo_issues:
-        issue_id = x["id"]
-        jira_related = jira.get_jira_issues_for_halo_issue(x["id"])
-        marching_orders[issue_id] = {"halo": x, "jira": jira_related}
-    for x in marching_orders.keys():
-        marching_orders[x]["disposition"] = determinator.get_disposition(marching_orders[x]["halo"], marching_orders[x]["jira"])  # NOQA
+    marching_orders = get_marching_orders(config, halo_issues)
 
     # Reconcile.
     for issue_id, other in marching_orders.items():
@@ -66,6 +57,43 @@ def main():
     return {"result": json.dumps(
                 {"message": "Halo/Jira issue sync complete",
                  "total_issues": len(marching_orders.items())})}
+
+
+def get_marching_orders(config, issue_list):
+        """Map Halo issue IDs to thread pool for checking Jira issues."""
+        determinator = jlib.Determinator(config.issue_status_closed,
+                                         config.issue_close_transition,
+                                         config.issue_status_hard_closed,
+                                         config.issue_reopen_transition)
+        packed_list = [(config, x) for x in issue_list]
+        issue_correlator_helper = jira_issue_correlator
+        pool = ThreadPool(5)
+        correlated_issues = pool.map(issue_correlator_helper, packed_list)
+        pool.close()
+        pool.join()
+        marching_orders = {x["halo"]["id"]: {"disposition": determinator.get_disposition(x["halo"], x["jira"]),  # NOQA
+                                             "halo": x["halo"],
+                                             "jira": x["jira"]}
+                           for x in correlated_issues}
+        return marching_orders
+
+
+def jira_issue_correlator(get_tup):
+    """Gets Jira issues related to a Halo issue ID.
+    Args:
+        get_tup(tuple): First item in tuple is the config object.  The second
+            is the Halo issue object of interest.
+    Returns:
+        dict: Halo issue information
+    """
+    config, halo_issue = get_tup
+    jira = jlib.JiraLocal(config.jira_api_url, config.jira_api_user,
+                          config.jira_api_token,
+                          config.jira_issue_id_field,
+                          config.jira_project_key,
+                          config.jira_issue_type)
+    jira_related = jira.get_jira_issues_for_halo_issue(halo_issue["id"])
+    return {"halo": halo_issue, "jira": jira_related}
 
 
 def lambda_handler(event, context):
