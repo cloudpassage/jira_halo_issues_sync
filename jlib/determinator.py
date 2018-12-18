@@ -5,19 +5,21 @@ from logger import Logger
 class Determinator(object):
     """
     Args:
+        issue_status_closed (str): Will be used or identifying re-openable
+            issues
         issue_close_transition (str): This transition will be used to close
             Jira issues.
         issue_status_hard_closed (str): Issues with this status will not be
             reopened. Instead, a new Jira issue will be created.
-        issue_reopen_transition (str): Reopened issues will be ceated with this
-            status.
+        issue_reopen_transition (str): This transition will be used for
+            reopening issues.
 
     """
 
     supported_types = ["sva", "csm", "fim", "lids"]
 
-    def __init__(self, issue_status_closed, issue_status_hard_closed,
-                 issue_close_transition, issue_reopen_transition):
+    def __init__(self, issue_status_closed, issue_close_transition,
+                 issue_status_hard_closed, issue_reopen_transition):
         self.issue_close_transition = issue_close_transition
         self.issue_status_closed = issue_status_closed
         self.issue_status_hard_closed = issue_status_hard_closed

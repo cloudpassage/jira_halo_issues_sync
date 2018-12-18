@@ -33,7 +33,7 @@ class JiraLocal(object):
         Returns:
             list: List of all Jira issues associated with Halo issue ID.
         """
-        search_string = "{}~{}".format(self.issue_id_field, issue_id)
+        search_string = '"{}"~{}'.format(self.issue_id_field, issue_id)
         results = self.jira_instance.search_issues(search_string)
         return results
 
@@ -71,9 +71,11 @@ class JiraLocal(object):
         options = [(t['id'], t['name']) for t in transitions
                    if t['name'] == transition]
         if not options:
-            msg = "Unable to transition {} via {}".format(issue_id, transition)
+            allowed_transitions = ", ".join([x["name"] for x in transitions])
+            msg = "Unable to transition {} via {}.".format(issue_id,
+                                                           transition)
+            msg += " Allowed transitions: {}".format(allowed_transitions)
             self.log.error(msg)
         else:
-            self.jira_instance.transition_issue(issue,
-                                                resolution=options[0][0])
+            self.jira_instance.transition_issue(issue, options[0][0])
         return
