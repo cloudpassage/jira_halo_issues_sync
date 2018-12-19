@@ -27,7 +27,7 @@ class Halo(object):
             raise e
         return
 
-    def describe_all_issues(self, timestamp, critical_only=False):
+    def describe_all_issues(self, timestamp, critical_only=True):
         """Return list of all isssues since timestamp, described.
 
         This wraps the initial retrieval of all issues touched since timestamp,
@@ -92,7 +92,7 @@ class Halo(object):
         """Get entire issue body."""
         return self.issues.describe(issue_id)
 
-    def get_issues_touched_since(self, timestamp, critical_only=False):
+    def get_issues_touched_since(self, timestamp, critical_only=True):
         """Return all issues created,resolved, or last seen since timestamp.
 
         Args:
@@ -104,14 +104,21 @@ class Halo(object):
             dict
         """
         if not critical_only:
-            return self.issues.list_all(status=["active", "resolved"],
-                                        state=["active", "inactive",
-                                               "missing", "retired"],
-                                        updated_at_gte=timestamp)
-        return self.issues.list_all(status=["active", "resolved"],
-                                    state=["active", "inactive",
-                                           "missing", "retired"],
-                                    critical="true", updated_at_gte=timestamp)
+            all_issues = self.issues.list_all(status="active,resolved",
+                                              # sort_by="last_seen_at.desc",
+                                              state="active,inactive,missing,retired")  # NOQA
+        else:
+            all_issues = self.issues.list_all(status="active,resolved",
+                                              # sort_by="last_seen_at.desc",
+                                              state="active,inactive,missing,retired",  # NOQA
+                                              critical=True)
+        return [x for x in all_issues if
+                self.targeted_date(x["last_seen_at"], timestamp)]
+
+    def targeted_date(self, sample, target):
+        if sample > target:
+            return True
+        return False
 
     def get_tool_version(self):
         """Get version of this tool from the __init__.py file."""
