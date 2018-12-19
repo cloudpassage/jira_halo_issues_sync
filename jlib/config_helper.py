@@ -65,7 +65,7 @@ class ConfigHelper(object):
                     ("time_range", self.int_from_env, "TIME_RANGE")]
         self.set_config_from_env()
         self.tstamp = (datetime.datetime.now()
-                       - datetime.timedelta(minutes=(abs(5000)))).isoformat()
+                       - datetime.timedelta(minutes=(abs(self.time_range)))).isoformat()  # NOQA
         self.logger = Logger()
 
     @classmethod
