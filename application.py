@@ -22,7 +22,39 @@ def main():
     # Get issues created, changed, deleted since starting timestamp
     msg = "Getting all Halo issues from the last {} minutes".format(config.time_range)  # NOQA
     logger.info(msg)
+    msg = "Starting timestamp: {}".format(config.tstamp)
+    logger.info(msg)
+
     halo_issues = halo.describe_all_issues(config.tstamp, config.critical_only)
+
+    if not halo_issues:
+        logger.info("No issues to process!")
+        sys.exit(0)
+
+    msg = "Halo issues to reconcile since {}: {}".format(config.tstamp,
+                                                         len(halo_issues))
+    logger.info(msg)
+
+    c_time_sorted = sorted([x["created_at"] for x in halo_issues])
+    msg = "Create times between: {} and {}".format(c_time_sorted[0],
+                                                   c_time_sorted[-1])
+    logger.info(msg)
+
+    ls_time_sorted = sorted([x["last_seen_at"] for x in halo_issues])
+    msg = "Last seen times between: {} and {}".format(ls_time_sorted[0],
+                                                      ls_time_sorted[-1])
+    logger.info(msg)
+
+    r_time_sorted = sorted([x["resolved_at"] for x in halo_issues])
+    msg = "Resolved times between: {} and {}".format(r_time_sorted[0],
+                                                     r_time_sorted[-1])
+    logger.info(msg)
+
+    for issue_type in ["lids", "csm", "fim", "sva", "sam", "fw", "agent"]:
+        count_this_type = [x for x in halo_issues
+                           if x["issue_type"] == issue_type]
+        msg = "Issue type {}: {}".format(issue_type, len(count_this_type))
+        logger.debug(msg)
 
     # Compare Halo issue IDs against existing Jira issues, to determine
     # what should be created, updated, closed, or reopened.
