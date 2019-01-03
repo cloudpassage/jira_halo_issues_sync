@@ -103,19 +103,43 @@ class Halo(object):
         Returns:
             dict
         """
-        if not critical_only:
-            all_issues = self.issues.list_all(status="active,resolved",
-                                              # sort_by="last_seen_at.desc",
-                                              state="active,inactive,missing,retired")  # NOQA
-        else:
-            all_issues = self.issues.list_all(status="active,resolved",
-                                              # sort_by="last_seen_at.desc",
-                                              state="active,inactive,missing,retired",  # NOQA
-                                              critical=True)
-        return [x for x in all_issues if
-                self.targeted_date(x["last_seen_at"], timestamp)]
+        updated_params = {"status": "active",
+                          "state": "active,inactive,missing,retired",
+                          "updated_at_gte": timestamp}
+        resolved_params = {'status': 'resolved',
+                           'resolved_at_gte': timestamp,
+                           'state': 'active,inactive,missing,retired'}
+        if critical_only:
+            updated_params["critical"] = "true"
+            resolved_params["critical"] = "true"
+        updated = self.http_helper.get_paginated("/v1/issues", "issues",
+                                                 99, params=updated_params)
+        resolved = self.http_helper.get_paginated("/v1/issues", "issues",
+                                                  99, params=resolved_params)
+        all_issues = updated + resolved
+        # Ensure filtering
+        issues_filtered = [x for x in all_issues if
+                           self.targeted_date(x["last_seen_at"], timestamp)]
+        bad = len(all_issues) - len(issues_filtered)
+        msg = "Discarding {} issues outside of time range".format(bad)
+        self.logger.debug(msg)
+        # Deduplicate
+        issues_final = self.deduplicate_issues(issues_filtered)
+        return issues_final
 
-    def targeted_date(self, sample, target):
+    @classmethod
+    def deduplicate_issues(cls, issues):
+        all_issue_ids = set([])
+        issues_final = []
+        for x in issues:
+            if x["id"] in all_issue_ids:
+                continue
+            all_issue_ids.add(x["id"])
+            issues_final.append(x)
+        return issues_final
+
+    @classmethod
+    def targeted_date(cls, sample, target):
         if sample > target:
             return True
         return False
