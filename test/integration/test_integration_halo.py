@@ -108,3 +108,8 @@ class TestIntegrationHalo:
         finding_url = halo.get_issue_full(target_issue["id"])["findings"][-1]["finding"]  # NOQA
         result = halo.describe_finding(finding_url)
         assert result is not None
+
+    def test_deduplicate_issues(self):
+        issues = [{"id": "12345"}, {"id": "123456"}, {"id": "12345"}]
+        deduped = jlib.Halo.deduplicate_issues(issues)
+        assert len(deduped) == 2
