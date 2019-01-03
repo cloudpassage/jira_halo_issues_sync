@@ -1,4 +1,4 @@
-FROM docker.io/halotools/python-sdk:ubuntu-16.04_sdk-1.2.1_py-2.7
+FROM docker.io/halotools/python-sdk:ubuntu-16.04_sdk-1.2.3_py-2.7
 MAINTAINER toolbox@cloudpassage.com
 
 ENV HALO_API_HOSTNAME=api.cloudpassage.com
