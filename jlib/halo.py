@@ -47,6 +47,8 @@ class Halo(object):
                          self.get_issues_touched_since(timestamp,
                                                        critical_only)}
         issue_getter = self.get_issue_full
+        msg = "Describing all Halo issues. Concurrency: {}".format(str(self.describe_issues_threads))  # NOQA
+        self.logger.debug(msg)
         # Enrich them all, 10 threads wide
         pool = ThreadPool(self.describe_issues_threads)
         results = pool.map(issue_getter, list(all_issue_ids))
