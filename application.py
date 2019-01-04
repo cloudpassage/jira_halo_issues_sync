@@ -17,7 +17,7 @@ def main():
 
     # Create objects we'll interact with later
     halo = jlib.Halo(config.halo_api_key, config.halo_api_secret_key,
-                     config.halo_api_hostname)
+                     config.halo_api_hostname, config.describe_issues_threads)
 
     # Get issues created, changed, deleted since starting timestamp
     msg = "Getting all Halo issues from the last {} minutes".format(config.time_range)  # NOQA
@@ -31,30 +31,8 @@ def main():
         logger.info("No issues to process!")
         sys.exit(0)
 
-    msg = "Halo issues to reconcile since {}: {}".format(config.tstamp,
-                                                         len(halo_issues))
-    logger.info(msg)
-
-    c_time_sorted = sorted([x["created_at"] for x in halo_issues])
-    msg = "Create times between: {} and {}".format(c_time_sorted[0],
-                                                   c_time_sorted[-1])
-    logger.info(msg)
-
-    ls_time_sorted = sorted([x["last_seen_at"] for x in halo_issues])
-    msg = "Last seen times between: {} and {}".format(ls_time_sorted[0],
-                                                      ls_time_sorted[-1])
-    logger.info(msg)
-
-    r_time_sorted = sorted([x["resolved_at"] for x in halo_issues])
-    msg = "Resolved times between: {} and {}".format(r_time_sorted[0],
-                                                     r_time_sorted[-1])
-    logger.info(msg)
-
-    for issue_type in ["lids", "csm", "fim", "sva", "sam", "fw", "agent"]:
-        count_this_type = [x for x in halo_issues
-                           if x["issue_type"] == issue_type]
-        msg = "Issue type {}: {}".format(issue_type, len(count_this_type))
-        logger.debug(msg)
+    # Print initial stats
+    print_initial_job_stats(config, halo_issues)
 
     # Compare Halo issue IDs against existing Jira issues, to determine
     # what should be created, updated, closed, or reopened.
@@ -65,18 +43,40 @@ def main():
     # Reconcile.
     reconcile_marching_orders(config, marching_orders)
 
-    # for issue_id, other in marching_orders.items():
-
     logger.info("Done!")
     return {"result": json.dumps(
                 {"message": "Halo/Jira issue sync complete",
                  "total_issues": len(marching_orders.items())})}
 
 
+def print_initial_job_stats(config, issues):
+    logger = jlib.Logger()
+    msgs = []
+    msgs.append("Halo issues to reconcile since {}: {}".format(config.tstamp,
+                                                               len(issues)))
+    c_time = sorted([x["created_at"] for x in issues])
+    msgs.append("Create times between: {} and {}".format(c_time[0],
+                                                         c_time[-1]))
+    ls_time = sorted([x["last_seen_at"] for x in issues])
+    msgs.append("Last seen times between: {} and {}".format(ls_time[0],
+                                                            ls_time[-1]))
+    r_time = sorted([x["resolved_at"] for x in issues])
+    msgs.append("Resolved times between: {} and {}".format(r_time[0],
+                                                           r_time[-1]))
+    for issue_type in ["lids", "csm", "fim", "sva", "sam", "fw", "agent"]:
+        count_this_type = [x for x in issues
+                           if x["issue_type"] == issue_type]
+        msgs.append("Issue type {}: {}".format(issue_type,
+                                               len(count_this_type)))
+    for msg in msgs:
+        logger.info(msg)
+    return
+
+
 def reconcile_marching_orders(config, marching_orders):
     packed_list = [(config, x) for x in marching_orders.items()]
     reconciler_helper = reconcile_issue
-    pool = ThreadPool(7)
+    pool = ThreadPool(config.reconciler_threads)
     pool.map(reconciler_helper, packed_list)
     pool.close()
     pool.join()
@@ -88,7 +88,7 @@ def reconcile_issue(reconcile_bundle):
     issue_id, other = item
     logger = jlib.Logger()
     halo = jlib.Halo(config.halo_api_key, config.halo_api_secret_key,
-                     config.halo_api_hostname)
+                     config.halo_api_hostname, config.describe_issues_threads)
     jira = jlib.JiraLocal(config.jira_api_url, config.jira_api_user,
                           config.jira_api_token,
                           config.jira_issue_id_field,
@@ -119,7 +119,7 @@ def get_marching_orders(config, issue_list):
                                          config.issue_reopen_transition)
         packed_list = [(config, x) for x in issue_list]
         issue_correlator_helper = jira_issue_correlator
-        pool = ThreadPool(5)
+        pool = ThreadPool(config.determinator_threads)
         correlated_issues = pool.map(issue_correlator_helper, packed_list)
         pool.close()
         pool.join()

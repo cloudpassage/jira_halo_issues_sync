@@ -11,7 +11,7 @@ class TestIntegrationHalo:
         key = os.getenv("HALO_API_KEY")
         secret = os.getenv("HALO_API_SECRET_KEY")
         api_host = os.getenv("HALO_API_HOSTNAME")
-        halo_obj = jlib.Halo(key, secret, api_host)
+        halo_obj = jlib.Halo(key, secret, api_host, 10)
         return halo_obj
 
     def get_iso_yesterday(self):
@@ -23,7 +23,7 @@ class TestIntegrationHalo:
         secret = "clearly_not_the_secret_you're_looking_for"
         api_host = os.getenv("HALO_API_HOSTNAME")
         with pytest.raises(cloudpassage.CloudPassageAuthentication):
-            jlib.Halo(key, secret, api_host)
+            jlib.Halo(key, secret, api_host, 10)
 
     def test_get_unsupported_asset_type(self):
         halo = self.get_halo_object()

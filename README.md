@@ -165,6 +165,10 @@ Available Halo fields are:
 
 | Variable name            | Purpose                                                                                    |
 |--------------------------|--------------------------------------------------------------------------------------------|
+| CRITICAL_ONLY            | Do not manage Jira issues for non-critical issues. (Default: False)                        |
+| DESCRIBE_ISSUES_THREADS  | Number of Halo issues to enrich from Halo API concurrently. Optional, default 10           |
+| DETERMINATOR_THREADS     | Number of Halo issues to compare against Jira simultaneously. Optional, default 5          |
+| RECONCILER_THREADS       | Number of Halo issues to reconcile to Jira simultaneously. Optional, default 7.            |
 | HALO_API_KEY             | API key ID with auditor permissions.                                                       |
 | HALO_API_SECRET_KEY      | API secret corresponding with HALO_API_KEY.                                                |
 | HALO_API_HOSTNAME        | Hostname for CloudPassage Halo API. Defaults to api.cloudpassage.com.                      |
@@ -181,7 +185,6 @@ Available Halo fields are:
 | ISSUE_STATUS_CLOSED      | This state is considered closed, but re-openable.                                          |
 | STATUS_HARD_CLOSED       | Optional, comma-separated. If issue status matches, do not reopen, create a new issue.     |
 | JIRA_ISSUE_TYPE          | Type of issue to create (bug, story, etc...).                                              |
-| CRITICAL_ONLY            | Do not manage Jira issues for non-critical issues. (Default: False)                        |
 | EXCLUDE_SERVER_SECURE    | Do not manage issues for issues associated with Server Secure. (unsupported in v1)         |
 | EXCLUDE_CONTAINER_SECURE | Do not manage issues for issues associated with Container Secure. (unsupported in v1)      |
 | EXCLUDE_CLOUD_SECURE     | Do not manage issues for issues associated with Cloud Secure. (unsupported in v1)          |
