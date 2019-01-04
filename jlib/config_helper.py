@@ -36,7 +36,8 @@ class ConfigHelper(object):
             issues to sync.
     """
 
-    concurrency_defaults = {"determinator_threads": 5,
+    concurrency_defaults = {"describe_issues_threads": 10,
+                            "determinator_threads": 5,
                             "reconciler_threads": 7}
 
     required = ["critical_only",
