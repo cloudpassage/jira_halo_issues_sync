@@ -6,7 +6,7 @@ from multiprocessing.dummy import Pool as ThreadPool
 
 
 class Halo(object):
-    def __init__(self, key, secret, api_host):
+    def __init__(self, key, secret, api_host, describe_issues_threads):
         """Instantiate with key, secret, and API host.
 
         Args:
@@ -25,6 +25,7 @@ class Halo(object):
         except cloudpassage.CloudPassageAuthentication as e:
             self.logger.critical("\nBad Halo API credentials!\n")
             raise e
+        self.describe_issues_threads = describe_issues_threads
         return
 
     def describe_all_issues(self, timestamp, critical_only=True):
@@ -46,8 +47,10 @@ class Halo(object):
                          self.get_issues_touched_since(timestamp,
                                                        critical_only)}
         issue_getter = self.get_issue_full
+        msg = "Describing all Halo issues. Concurrency: {}".format(str(self.describe_issues_threads))  # NOQA
+        self.logger.debug(msg)
         # Enrich them all, 10 threads wide
-        pool = ThreadPool(10)
+        pool = ThreadPool(self.describe_issues_threads)
         results = pool.map(issue_getter, list(all_issue_ids))
         pool.close()
         pool.join()
