@@ -76,7 +76,7 @@ def main():
 def reconcile_marching_orders(config, marching_orders):
     packed_list = [(config, x) for x in marching_orders.items()]
     reconciler_helper = reconcile_issue
-    pool = ThreadPool(7)
+    pool = ThreadPool(config.reconciler_threads)
     pool.map(reconciler_helper, packed_list)
     pool.close()
     pool.join()
@@ -119,7 +119,7 @@ def get_marching_orders(config, issue_list):
                                          config.issue_reopen_transition)
         packed_list = [(config, x) for x in issue_list]
         issue_correlator_helper = jira_issue_correlator
-        pool = ThreadPool(5)
+        pool = ThreadPool(config.determinator_threads)
         correlated_issues = pool.map(issue_correlator_helper, packed_list)
         pool.close()
         pool.join()
