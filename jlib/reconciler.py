@@ -36,8 +36,7 @@ class Reconciler(object):
         message = "Halo ID: {}\tModule: {}\tAction: {}".format(issue_id,
                                                                module, action)
         self.logger.info(message)
-        self.logger.debug("Action: {}\tInstructions: {}".format(action,
-                                                                instructions))
+        self.logger.debug("Halo ID: {}\tModule: {}\tAction: {}\tInstructions: {}".format(issue_id, module, action, instructions))  # NOQA
         if action not in self.supported_actions:
             msg = "Unsupported action for {}: {}".format(issue_meta["id"],
                                                          action)
