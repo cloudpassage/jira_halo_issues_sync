@@ -122,7 +122,8 @@ class Halo(object):
                            self.targeted_date(x["last_seen_at"], timestamp)]
         bad = len(all_issues) - len(issues_filtered)
         msg = "Discarding {} issues outside of time range".format(bad)
-        self.logger.debug(msg)
+        if bad != 0:
+            self.logger.info(msg)
         # Deduplicate
         issues_final = self.deduplicate_issues(issues_filtered)
         return issues_final
