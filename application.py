@@ -17,7 +17,7 @@ def main():
 
     # Create objects we'll interact with later
     halo = jlib.Halo(config.halo_api_key, config.halo_api_secret_key,
-                     config.halo_api_hostname)
+                     config.halo_api_hostname, config.describe_issues_threads)
 
     # Get issues created, changed, deleted since starting timestamp
     msg = "Getting all Halo issues from the last {} minutes".format(config.time_range)  # NOQA
@@ -88,7 +88,7 @@ def reconcile_issue(reconcile_bundle):
     issue_id, other = item
     logger = jlib.Logger()
     halo = jlib.Halo(config.halo_api_key, config.halo_api_secret_key,
-                     config.halo_api_hostname)
+                     config.halo_api_hostname, config.describe_issues_threads)
     jira = jlib.JiraLocal(config.jira_api_url, config.jira_api_user,
                           config.jira_api_token,
                           config.jira_issue_id_field,

@@ -7,7 +7,7 @@ class TestIntegrationReconciler:
         key = os.getenv("HALO_API_KEY")
         secret = os.getenv("HALO_API_SECRET_KEY")
         api_host = os.getenv("HALO_API_HOSTNAME")
-        halo_obj = jlib.Halo(key, secret, api_host)
+        halo_obj = jlib.Halo(key, secret, api_host, 10)
         return halo_obj
 
     def get_jira_object(self):
