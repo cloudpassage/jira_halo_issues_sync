@@ -116,8 +116,8 @@ class Halo(object):
                                                  99, params=updated_params)
         resolved = self.http_helper.get_paginated("/v1/issues", "issues",
                                                   99, params=resolved_params)
-        all_issues = updated + resolved
-        # Ensure filtering
+        all_issues = resolved + updated
+        # Ensure time filtering works
         issues_filtered = [x for x in all_issues if
                            self.targeted_date(x["last_seen_at"], timestamp)]
         bad = len(all_issues) - len(issues_filtered)

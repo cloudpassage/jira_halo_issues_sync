@@ -9,6 +9,9 @@ class ConfigHelper(object):
 
     Attributes:
         critical_only (bool): Only sync critical issues.
+        determinator_threads (int): Number of issues to be concurrently
+            compared between Halo and Jira to determine the appropriate action
+            to be taken (create, update, close, etc...).
         halo_api_key (str): Auditor API key for CloudPassage Halo.
         halo_api_secret_key (str): Halo API secret.
         halo_api_hostname (str): Halo API hostname.
@@ -27,42 +30,49 @@ class ConfigHelper(object):
             reopened. Instead, a new Jira issue will be created.
         issue_reopen_transition (str): Reopened issues will be ceated with this
             status.
+        reconciler_threads (int): Maximum number of issues to be simultameously
+            recinciled between Halo and Jira.
         time_range (int): Number of minutes in the past to query for Halo
             issues to sync.
     """
 
+    concurrency_defaults = {"determinator_threads": 5,
+                            "reconciler_threads": 7}
+
     required = ["critical_only",
+                "determinator_threads",
                 "halo_api_key",
                 "halo_api_secret_key",
-                "jira_api_user",
-                "jira_api_token",
-                "jira_api_url",
-                "jira_issue_id_field",
-                "jira_project_key",
-                "jira_issue_type",
-                "issue_status_closed",
                 "issue_close_transition",
                 "issue_reopen_transition",
+                "issue_status_closed",
+                "jira_api_token",
+                "jira_api_url",
+                "jira_api_user",
+                "jira_issue_id_field",
+                "jira_issue_type",
+                "jira_project_key",
+                "reconciler_threads",
                 "time_range"]
 
     def __init__(self):
-        self.ref = [("critical_only", self.bool_from_env, "CRITICAL_ONLY"),
-                    ("halo_api_key", self.str_from_env, "HALO_API_KEY"),
-                    ("halo_api_secret_key", self.str_from_env, "HALO_API_SECRET_KEY"),  # NOQA
-                    ("halo_api_hostname", self.str_from_env, "HALO_API_HOSTNAME"),  # NOQA
-                    ("jira_api_user", self.str_from_env, "JIRA_API_USER"),
-                    ("jira_api_token", self.str_from_env, "JIRA_API_TOKEN"),
-                    ("jira_api_url", self.str_from_env, "JIRA_API_URL"),
-                    ("jira_field_static", self.dict_from_env, "JIRA_FIELD_STATIC"),  # NOQA
-                    ("jira_field_mapping", self.dict_from_env, "JIRA_FIELD_MAPPING"),  # NOQA
-                    ("jira_issue_id_field", self.str_from_env, "JIRA_ISSUE_ID_FIELD"),  # NOQA
-                    ("jira_project_key", self.str_from_env, "JIRA_PROJECT_KEY"),  # NOQA
-                    ("jira_issue_type", self.str_from_env, "JIRA_ISSUE_TYPE"),
-                    ("issue_close_transition", self.str_from_env, "ISSUE_CLOSE_TRANSITION"),  # NOQA
-                    ("issue_status_closed", self.str_from_env, "ISSUE_STATUS_CLOSED"),  # NOQA
-                    ("issue_status_hard_closed", self.str_from_env, "ISSUE_STATUS_HARD_CLOSED"),  # NOQA
-                    ("issue_reopen_transition", self.str_from_env, "ISSUE_REOPEN_TRANSITION"),  # NOQA
-                    ("time_range", self.int_from_env, "TIME_RANGE")]
+        self.ref = [("critical_only", self.bool_from_env),
+                    ("halo_api_key", self.str_from_env),
+                    ("halo_api_secret_key", self.str_from_env),
+                    ("halo_api_hostname", self.str_from_env),
+                    ("jira_api_user", self.str_from_env),
+                    ("jira_api_token", self.str_from_env),
+                    ("jira_api_url", self.str_from_env),
+                    ("jira_field_static", self.dict_from_env),
+                    ("jira_field_mapping", self.dict_from_env),
+                    ("jira_issue_id_field", self.str_from_env),
+                    ("jira_project_key", self.str_from_env),
+                    ("jira_issue_type", self.str_from_env),
+                    ("issue_close_transition", self.str_from_env),
+                    ("issue_status_closed", self.str_from_env),
+                    ("issue_status_hard_closed", self.str_from_env),
+                    ("issue_reopen_transition", self.str_from_env),
+                    ("time_range", self.int_from_env)]
         self.set_config_from_env()
         self.tstamp = (datetime.datetime.now()
                        - datetime.timedelta(minutes=(abs(self.time_range)))).isoformat()  # NOQA
@@ -124,6 +134,9 @@ class ConfigHelper(object):
         for setting in self.ref:
             varname = setting[0]
             env_getter = setting[1]
-            env_var_name = setting[2]
+            env_var_name = varname.upper()
             result = env_getter(env_var_name)
             setattr(self, varname, result)
+        # Set concurrency vars
+        for varname, default in self.concurrency_defaults.items():
+            setattr(self, varname, int(os.getenv(varname.upper(), default)))
