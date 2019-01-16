@@ -24,6 +24,7 @@ script:
   -e ISSUE_CLOSE_TRANSITION=${ISSUE_CLOSE_TRANSITION}
   -e ISSUE_REOPEN_TRANSITION=${ISSUE_REOPEN_TRANSITION}
   -e JIRA_ISSUE_TYPE=${JIRA_ISSUE_TYPE}
+  -e CC_TEST_REPORTER_ID=${CC_TEST_REPORTER_ID}
   testme /src/jira_halo_issues_sync/run_tests.sh
 - docker run -it --rm
   -e HALO_API_KEY=${HALO_API_KEY}
