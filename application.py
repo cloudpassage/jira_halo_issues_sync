@@ -5,7 +5,6 @@ import json
 import os
 import sys
 from base64 import b64decode
-from multiprocessing.dummy import Pool as ThreadPool
 
 
 def main():
@@ -20,149 +19,32 @@ def main():
                      config.halo_api_hostname, config.describe_issues_threads)
 
     # Get issues created, changed, deleted since starting timestamp
-    msg = "Getting all Halo issues from the last {} minutes".format(config.time_range)  # NOQA
-    logger.info(msg)
-    msg = "Starting timestamp: {}".format(config.tstamp)
+    msg = "Getting all Halo issues since {}".format(config.tstamp)  # NOQA
     logger.info(msg)
 
     halo_issues = halo.describe_all_issues(config.tstamp, config.critical_only)
 
+    # Bail here if there are no issues to process.
     if not halo_issues:
         logger.info("No issues to process!")
         sys.exit(0)
 
     # Print initial stats
-    print_initial_job_stats(config, halo_issues)
+    jlib.Utility.print_initial_job_stats(config.tstamp, halo_issues)
 
     # Compare Halo issue IDs against existing Jira issues, to determine
     # what should be created, updated, closed, or reopened.
     msg = "Getting Jira issues which correspond to Halo issues."
     logger.info(msg)
-    marching_orders = get_marching_orders(config, halo_issues)
+    marching_orders = jlib.Utility.get_marching_orders(config, halo_issues)
 
     # Reconcile.
-    reconcile_marching_orders(config, marching_orders)
+    jlib.Reconciler.reconcile_marching_orders(config, marching_orders)
 
     logger.info("Done!")
     return {"result": json.dumps(
                 {"message": "Halo/Jira issue sync complete",
                  "total_issues": len(marching_orders.items())})}
-
-
-def print_initial_job_stats(config, issues):
-    logger = jlib.Logger()
-    msgs = []
-    msgs.append("Halo issues to reconcile since {}: {}".format(config.tstamp,
-                                                               len(issues)))
-    c_time = sorted([x["created_at"] for x in issues])
-    msgs.append("Create times between: {} and {}".format(c_time[0],
-                                                         c_time[-1]))
-    ls_time = sorted([x["last_seen_at"] for x in issues])
-    msgs.append("Last seen times between: {} and {}".format(ls_time[0],
-                                                            ls_time[-1]))
-    r_time = sorted([x["resolved_at"] for x in issues])
-    msgs.append("Resolved times between: {} and {}".format(r_time[0],
-                                                           r_time[-1]))
-    for issue_type in ["lids", "csm", "fim", "sva", "sam", "fw", "agent"]:
-        count_this_type = [x for x in issues
-                           if x["issue_type"] == issue_type]
-        msgs.append("Issue type {}: {}".format(issue_type,
-                                               len(count_this_type)))
-    for msg in msgs:
-        logger.info(msg)
-    return
-
-
-def reconcile_marching_orders(config, orders_dict):
-    batch_size = config.reconciler_threads * 2
-    marching_orders = list(orders_dict.items())
-    ordered_actions = sorted(marching_orders, key=get_tstamp, reverse=True)
-    packed_list = [(config, x) for x in ordered_actions]
-    reconciler_helper = reconcile_issue
-    while packed_list:
-        this_batch = packed_list[:batch_size]
-        del packed_list[:batch_size]
-        batch_timestamp = get_tstamp(this_batch[-1][1])
-        pool = ThreadPool(config.reconciler_threads)
-        pool.map(reconciler_helper, this_batch)
-        pool.close()
-        pool.join()
-        if config.state_manager:
-            config.state_manager.increment_timestamp(batch_timestamp)
-    if config.state_manager:
-        config.state_manager.set_timestamp(batch_timestamp)
-    return
-
-
-def get_tstamp(order):
-    """Return the tstamp from the 'halo' section of a marching order."""
-    result = order[1]["halo"]["tstamp"]
-    return result
-
-
-def reconcile_issue(reconcile_bundle):
-    config, item = reconcile_bundle
-    issue_id, other = item
-    logger = jlib.Logger()
-    halo = jlib.Halo(config.halo_api_key, config.halo_api_secret_key,
-                     config.halo_api_hostname, config.describe_issues_threads)
-    jira = jlib.JiraLocal(config.jira_api_url, config.jira_api_user,
-                          config.jira_api_token,
-                          config.jira_issue_id_field,
-                          config.jira_project_key,
-                          config.jira_issue_type)
-    reconciler = jlib.Reconciler(halo, jira, config.jira_field_mapping,
-                                 config.jira_field_static)
-    action = other["disposition"][0]
-    if action == "create":
-        msg = "Creating Jira issue for Halo issue ID {}".format(issue_id)
-    elif action == "create_closed":
-        msg = "Creating and closing Jira issue for Halo issue ID {}".format(issue_id)  # NOQA
-    elif action == "comment":
-        msg = "Commenting Jira issue for Halo issue ID {}".format(issue_id)
-    elif action == "change_status":
-        msg = "Transitioning Jira issue for Halo issue ID {}".format(issue_id)  # NOQA
-    elif action == "nothing":
-        logger.info("Nothing to do for Halo issue ID {}".format(issue_id))
-    logger.info(msg)
-    reconciler.reconcile(other["disposition"], other["halo"])
-
-
-def get_marching_orders(config, issue_list):
-        """Map Halo issue IDs to thread pool for checking Jira issues."""
-        determinator = jlib.Determinator(config.issue_status_closed,
-                                         config.issue_close_transition,
-                                         config.issue_status_hard_closed,
-                                         config.issue_reopen_transition)
-        packed_list = [(config, x) for x in issue_list]
-        issue_correlator_helper = jira_issue_correlator
-        pool = ThreadPool(config.determinator_threads)
-        correlated_issues = pool.map(issue_correlator_helper, packed_list)
-        pool.close()
-        pool.join()
-        marching_orders = {x["halo"]["id"]: {"disposition": determinator.get_disposition(x["halo"], x["jira"]),  # NOQA
-                                             "halo": x["halo"],
-                                             "jira": x["jira"]}
-                           for x in correlated_issues}
-        return marching_orders
-
-
-def jira_issue_correlator(get_tup):
-    """Gets Jira issues related to a Halo issue ID.
-    Args:
-        get_tup(tuple): First item in tuple is the config object.  The second
-            is the Halo issue object of interest.
-    Returns:
-        dict: Halo issue information
-    """
-    config, halo_issue = get_tup
-    jira = jlib.JiraLocal(config.jira_api_url, config.jira_api_user,
-                          config.jira_api_token,
-                          config.jira_issue_id_field,
-                          config.jira_project_key,
-                          config.jira_issue_type)
-    jira_related = jira.get_jira_issues_for_halo_issue(halo_issue["id"])
-    return {"halo": halo_issue, "jira": jira_related}
 
 
 def lambda_handler(event, context):
