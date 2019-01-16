@@ -1,7 +1,10 @@
 """Manage configuration for application."""
 import datetime
 import os
-from logger import Logger
+import sys
+from .logger import Logger
+from .manage_state import ManageState
+from botocore.exceptions import ClientError
 
 
 class ConfigHelper(object):
@@ -32,8 +35,11 @@ class ConfigHelper(object):
             status.
         reconciler_threads (int): Maximum number of issues to be simultameously
             recinciled between Halo and Jira.
+        state_manager (None or instance of ManageState): This allows us to
+            manage a timestamp placeholder between invocations.
         time_range (int): Number of minutes in the past to query for Halo
-            issues to sync.
+            issues to sync. Defaults to 15. This setting is ignored if AWS SSM
+            is configured to manage the timestamp between invocations.
     """
 
     concurrency_defaults = {"describe_issues_threads": 10,
@@ -73,11 +79,13 @@ class ConfigHelper(object):
                     ("issue_status_closed", self.str_from_env),
                     ("issue_status_hard_closed", self.str_from_env),
                     ("issue_reopen_transition", self.str_from_env),
+                    ("aws_ssm_timestamp_param", self.str_from_env),
                     ("time_range", self.int_from_env)]
-        self.set_config_from_env()
-        self.tstamp = (datetime.datetime.now()
-                       - datetime.timedelta(minutes=(abs(self.time_range)))).isoformat()  # NOQA
         self.logger = Logger()
+        self.set_config_from_env()
+        self.state_manager = None
+        self.aws_ssm_timestamp_param = "/CloudPassage-Jira/issues/timestamp"
+        self.set_timestamp_from_env()
 
     @classmethod
     def bool_from_env(cls, var_name):
@@ -141,3 +149,28 @@ class ConfigHelper(object):
         # Set concurrency vars
         for varname, default in self.concurrency_defaults.items():
             setattr(self, varname, int(os.getenv(varname.upper(), default)))
+
+    def set_timestamp_from_env(self):
+        """Set self.tstamp for starting time.
+
+        AWS-SSM configuration for supersedes the TIME_RANGE env var
+        setting.
+        """
+        try:
+            self.state_manager = ManageState(self.aws_ssm_timestamp_param)
+            self.tstamp = self.state_manager.get_timestamp()
+        except ValueError:
+            self.tstamp = (datetime.datetime.now()
+                           - datetime.timedelta(minutes=(abs(self.time_range)))).isoformat()  # NOQA
+        except ClientError as e:
+            if "ParameterNotFound" in repr(e):
+                msg = ("Parameter {} not found. Will create param, set it and "
+                       "exit.".format(self.aws_ssm_timestamp_param))
+                tstamp = (datetime.datetime.now()
+                          - datetime.timedelta(minutes=(abs(self.time_range)))).isoformat()  # NOQA
+                self.state_manager.set_timestamp(tstamp)
+                self.logger.error(msg)
+                sys.exit(1)
+            msg = "AWS role configuration issue: {}".format(e)
+            self.logger.error(msg)
+            sys.exit(1)
