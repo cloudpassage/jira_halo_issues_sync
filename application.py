@@ -73,14 +73,31 @@ def print_initial_job_stats(config, issues):
     return
 
 
-def reconcile_marching_orders(config, marching_orders):
-    packed_list = [(config, x) for x in marching_orders.items()]
+def reconcile_marching_orders(config, orders_dict):
+    batch_size = config.reconciler_threads * 2
+    marching_orders = list(orders_dict.items())
+    ordered_actions = sorted(marching_orders, key=get_tstamp, reverse=True)
+    packed_list = [(config, x) for x in ordered_actions]
     reconciler_helper = reconcile_issue
-    pool = ThreadPool(config.reconciler_threads)
-    pool.map(reconciler_helper, packed_list)
-    pool.close()
-    pool.join()
+    while packed_list:
+        this_batch = packed_list[:batch_size]
+        del packed_list[:batch_size]
+        batch_timestamp = get_tstamp(this_batch[-1][1])
+        pool = ThreadPool(config.reconciler_threads)
+        pool.map(reconciler_helper, this_batch)
+        pool.close()
+        pool.join()
+        if config.state_manager:
+            config.state_manager.increment_timestamp(batch_timestamp)
+    if config.state_manager:
+        config.state_manager.set_timestamp(batch_timestamp)
     return
+
+
+def get_tstamp(order):
+    """Return the tstamp from the 'halo' section of a marching order."""
+    result = order[1]["halo"]["tstamp"]
+    return result
 
 
 def reconcile_issue(reconcile_bundle):
