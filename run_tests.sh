@@ -17,9 +17,11 @@ echo "ISSUE_REOPEN_TRANSITION"
 echo "JIRA_ISSUE_TYPE"
 
 if [ -z "${CC_TEST_REPORTER_ID}" ]; then
+  echo "Code Climate coverage reporter token not set!"
   /usr/bin/python -m py.test --cov=jlib --cov-report=term-missing --profile test/
   export TEST_STATUS=$?
 else
+  echo "Code Climate coverage reporter token detected!"
   apt-get update && apt-get install -y git
   curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   chmod +x ./cc-test-reporter
