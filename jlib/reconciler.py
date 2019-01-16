@@ -1,8 +1,11 @@
 """Reconcile Halo issues against Jira."""
+from multiprocessing.dummy import Pool as ThreadPool
 
-from formatter import Formatter
-from logger import Logger
-from mapper import Mapper
+from .formatter import Formatter
+from .halo import Halo
+from .jira_local import JiraLocal
+from .logger import Logger
+from .mapper import Mapper
 
 
 class Reconciler(object):
@@ -28,6 +31,63 @@ class Reconciler(object):
         self.static_mapping = static_mapping
         return
 
+    @classmethod
+    def reconcile_marching_orders(cls, config, orders_dict):
+        batch_size = config.reconciler_threads * 2
+        marching_orders = list(orders_dict.items())
+        ordered_actions = sorted(marching_orders, key=cls.get_tstamp)
+        packed_list = [(config, x) for x in ordered_actions]
+        reconciler_helper = cls.reconcile_issue
+        while packed_list:
+            this_batch = packed_list[:batch_size]
+            del packed_list[:batch_size]
+            batch_timestamp = cls.get_tstamp(this_batch[-1][1])
+            pool = ThreadPool(config.reconciler_threads)
+            pool.map(reconciler_helper, this_batch)
+            pool.close()
+            pool.join()
+            if config.state_manager:
+                config.state_manager.increment_timestamp(batch_timestamp)
+        if config.state_manager:
+            config.state_manager.set_timestamp(batch_timestamp)
+        return
+
+    @classmethod
+    def get_tstamp(cls, order):
+        """Return the tstamp from the 'halo' section of a marching order."""
+        result = order[1]["halo"]["tstamp"]
+        return result
+
+    @classmethod
+    def reconcile_issue(cls, reconcile_bundle):
+        config, item = reconcile_bundle
+        issue_id, other = item
+        logger = Logger()
+        halo = Halo(config.halo_api_key, config.halo_api_secret_key,
+                    config.halo_api_hostname, config.describe_issues_threads)
+        jira = JiraLocal(config.jira_api_url, config.jira_api_user,
+                         config.jira_api_token,
+                         config.jira_issue_id_field,
+                         config.jira_project_key,
+                         config.jira_issue_type)
+        reconciler = cls(halo, jira, config.jira_field_mapping,
+                         config.jira_field_static)
+        action = other["disposition"][0]
+        if action == "create":
+            msg = "Creating Jira issue for Halo issue ID {}".format(issue_id)
+        elif action == "create_closed":
+            msg = ("Creating and closing Jira issue for Halo issue "
+                   "ID {}".format(issue_id))
+        elif action == "comment":
+            msg = "Commenting Jira issue for Halo issue ID {}".format(issue_id)
+        elif action == "change_status":
+            msg = ("Transitioning Jira issue for Halo issue ID "
+                   "{}".format(issue_id))
+        elif action == "nothing":
+            logger.info("Nothing to do for Halo issue ID {}".format(issue_id))
+        logger.info(msg)
+        reconciler.reconcile(other["disposition"], other["halo"])
+
     def reconcile(self, determination, issue_meta):
         """Return tuple (True, ) for success, else (False, "reason")."""
         action, instructions = determination
@@ -36,7 +96,9 @@ class Reconciler(object):
         message = "Halo ID: {}\tModule: {}\tAction: {}".format(issue_id,
                                                                module, action)
         self.logger.info(message)
-        self.logger.debug("Halo ID: {}\tModule: {}\tAction: {}\tInstructions: {}".format(issue_id, module, action, instructions))  # NOQA
+        self.logger.debug("Halo ID: {}\tModule: {}\tAction: {}\t"
+                          "Instructions: {}".format(issue_id, module, action,
+                                                    instructions))
         if action not in self.supported_actions:
             msg = "Unsupported action for {}: {}".format(issue_meta["id"],
                                                          action)
@@ -94,7 +156,8 @@ class Reconciler(object):
             issue_type = issue_described["issue_type"]
             finding_meta = issue_described["findings"][-1]
         except KeyError as e:
-            msg = "Unable to parse Halo issue: {}\n{}".format(str(e), str(issue_described))  # NOQA
+            msg = ("Unable to parse Halo issue: "
+                   "{}\n{}".format(str(e), str(issue_described)))
             self.logger.error(msg)
         finding_described = self.halo.describe_finding(finding_meta["finding"])
         finding_formatted = Formatter.format_object("finding", issue_type,
