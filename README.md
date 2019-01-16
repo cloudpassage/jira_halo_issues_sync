@@ -175,7 +175,7 @@ Available Halo fields are:
 | JIRA_API_USER            | Username corresponding to JIRA_API_TOKEN.                                                  |
 | JIRA_API_TOKEN           | API token with access as described in __Jira permissions__, above.                         |
 | JIRA_API_URL             | API URL for Jira instance. (https://my.jira.com)                                           |
-| TIME_RANGE               | Number of minutes since last run of tool.                                                  |
+| TIME_RANGE               | Number of minutes since last run of tool. Optional, defaults to 15.                        |
 | JIRA_ISSUE_ID_FIELD      | Name of field in Jira issue for Halo issue ID. Used to prevent duplicate issues in Jira.   |
 | JIRA_FIELD_MAPPING       | (Optional) See __Jira field mapping__, above.                                              |
 | JIRA_FIELD_STATIC        | (Optional) Set static values for fields in Jira issues                                     |

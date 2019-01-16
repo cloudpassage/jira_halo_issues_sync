@@ -54,7 +54,8 @@ class Halo(object):
         results = pool.map(issue_getter, list(all_issue_ids))
         pool.close()
         pool.join()
-        return results
+        retval = [self.time_label_issue(x) for x in results]  # Set placeholder
+        return retval
 
     def describe_asset(self, asset_type, asset_id):
         """Get full json description of asset."""
@@ -106,19 +107,29 @@ class Halo(object):
         Returns:
             dict
         """
-        updated_params = {"status": "active",
-                          "state": "active,inactive,missing,retired",
-                          "updated_at_gte": timestamp}
-        resolved_params = {'status': 'resolved',
-                           'resolved_at_gte': timestamp,
-                           'state': 'active,inactive,missing,retired'}
         if critical_only:
-            updated_params["critical"] = "true"
-            resolved_params["critical"] = "true"
-        updated = self.http_helper.get_paginated("/v1/issues", "issues",
-                                                 99, params=updated_params)
-        resolved = self.http_helper.get_paginated("/v1/issues", "issues",
-                                                  99, params=resolved_params)
+            updated = self.issues.list_all(
+                status="active",
+                critical=True,
+                state="active,inactive,missing,retired",
+                last_seen_at_gte=timestamp)
+            resolved = self.issues.list_all(
+                status="resolved",
+                critical=True,
+                state="active,inactive,missing,retired",
+                resolved_at_gte=timestamp)
+        else:
+            updated = self.issues.list_all(
+                status="active",
+                state="active,inactive,missing,retired",
+                last_seen_at_gte=timestamp)
+            resolved = self.issues.list_all(
+                status="resolved",
+                state="active,inactive,missing,retired",
+                resolved_at_gte=timestamp)
+        msg = "Active issues: {} Resolved issues: {}.".format(len(updated),
+                                                              len(resolved))
+        self.logger.info(msg)
         all_issues = resolved + updated
         # Ensure time filtering works
         issues_filtered = [x for x in all_issues if
@@ -130,6 +141,21 @@ class Halo(object):
         # Deduplicate
         issues_final = self.deduplicate_issues(issues_filtered)
         return issues_final
+
+    @classmethod
+    def time_label_issue(cls, issue):
+        """Return a copy of the `issue` arg (dict) with added `tstamp` field.
+
+        The tstamp field is determined by taking the most recent timestamp
+        from the issue, by looking at created_at, last_seen_at, and
+        resolved_at.
+
+        """
+        target_fields = ["created_at", "resolved_at", "last_seen_at"]
+        tstamps = [issue[x] for x in target_fields if issue[x] is not None]
+        retval = issue.copy()
+        retval["tstamp"] = sorted(tstamps)[-1]  # Grab the newest of all
+        return retval
 
     @classmethod
     def deduplicate_issues(cls, issues):
