@@ -33,7 +33,7 @@ may support ContainerSecure- and CloudSecure-related issues.
 
 This integration is delivered as Python tool, enclosed in a Docker container
 image. Sure, you can run the enclosed tool by itself... but running it outside
-the container image is not supported.
+the container image or Lambda (see LAMBDA.md) is not supported.
 
 The container is run periodically, and retrieves the status of all issues which
 have been opened, closed, or updated since the last time the tool was run. The
@@ -131,7 +131,34 @@ tasked with resolving vulnerabilities.
 
 ### Jira permissions
 
-Requirements TBD
+This tool creates, updates, and performs workflow transitions on issues in Jira.
+The issue type and status transitions applied to issues created by this tool
+are completely configurable, as are field mappings from Halo to Jira. As such,
+it is not possible for us to create specific policy guidance which will allow
+you to maintain the principle of least privilege when configuring this
+synchronization tool.
+
+Every mature Jira implementation is different, and complexity can grow
+over time. Once you have a user account configured with the permissions you
+believe to be appropriate to create, update, and transition issues according
+to your workflow's requirements (and this tool's configuration), it makes sense
+to log in as that user and step through all the transitions you want the tool
+to perform manually. This will allow you to catch edge cases before deployment,
+and will make it easier to maintain the principle of least privilege. A
+preliminary validation process might look like this:
+
+* Log in as the user account which the integration will be using
+* Create a test issue of type `JIRA_ISSUE_TYPE`, with a unique string in the
+field named by `JIRA_ISSUE_ID_FIELD`.
+* Perform a search for the unique string you used in `JIRA_ISSUE_ID_FIELD`,
+and confirm that exactly one issue is found in Jira.
+* Add a comment to the test issue.
+* Transition the issue using the transition named in `ISSUE_CLOSE_TRANSITION`.
+* Transition the issue using the transition named in `ISSUE_REOPEN_TRANSITION`.
+* If your workflow automation migrates Jira issues between projects, you should
+confirm that the integration account can perform the transitions mentioned above
+in each of the projects where a Halo issue may be migrated.
+
 
 ### Jira field mapping
 
