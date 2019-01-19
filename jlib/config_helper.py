@@ -90,11 +90,12 @@ class ConfigHelper(object):
     @classmethod
     def bool_from_env(cls, var_name):
         """Return True if env var is set to "True" or "true", else False."""
+        logger = Logger()
+        result = False
         if os.getenv(var_name) in ["True", "true"]:
-            return True
-        elif os.getenv(var_name) in ["False", "false"]:
-            return False
-        return False
+            result = True
+        logger.info("Setting {} to {}".format(var_name, str(result)))
+        return result
 
     @classmethod
     def dict_from_env(cls, var_name):
@@ -102,6 +103,7 @@ class ConfigHelper(object):
 
         K:V;K:V
         """
+        logger = Logger()
         try:
             result = {x.split(":")[0]: x.split(":")[1]
                       for x in os.getenv(var_name).split(";")}
@@ -109,12 +111,16 @@ class ConfigHelper(object):
             result = {}
         except IndexError:
             result = {}
+        logger.info("Setting {} to {}".format(var_name, str(result)))
         return result
 
     @classmethod
     def int_from_env(cls, var_name):
         """Return integer derived from env var."""
-        return int(os.getenv(var_name, 0))
+        logger = Logger()
+        result = int(os.getenv(var_name, 0))
+        logger.info("Setting {} to {}".format(var_name, str(result)))
+        return result
 
     @classmethod
     def list_from_env(cls, var_name):
@@ -131,7 +137,9 @@ class ConfigHelper(object):
 
     def required_vars_are_set(self):
         """Return True if all required vars are set, False otherwise."""
-        missing = [x for x in self.required if getattr(self, x) in [0, ""]]
+        missing = [x for x in self.required
+                   if getattr(self, x) in [0, ""]
+                   and not isinstance(getattr(self, x), bool)]
         if missing:
             msg = "Missing config attributes: {}".format(", ".join(missing))
             self.logger.critical(msg)
