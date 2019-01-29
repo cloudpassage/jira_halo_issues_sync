@@ -54,7 +54,7 @@ class Halo(object):
         results = pool.map(issue_getter, list(all_issue_ids))
         pool.close()
         pool.join()
-        retval = [self.time_label_issue(x) for x in results]  # Set placeholder
+        retval = [self.time_label_issue(x) for x in results]
         return retval
 
     def describe_asset(self, asset_type, asset_id):
@@ -131,13 +131,20 @@ class Halo(object):
                                                               len(resolved))
         self.logger.info(msg)
         all_issues = resolved + updated
+        labeled = [self.time_label_issue(x) for x in all_issues]
         # Ensure time filtering works
-        issues_filtered = [x for x in all_issues if
-                           self.targeted_date(x["last_seen_at"], timestamp)]
-        bad = len(all_issues) - len(issues_filtered)
+        issues_filtered = [x for x in labeled if
+                           self.targeted_date(x["tstamp"], timestamp)]
+        discarded_issues = [x for x in labeled if not
+                            self.targeted_date(x["tstamp"], timestamp)]
+        bad = len(labeled) - len(issues_filtered)
         msg = "Discarding {} issues outside of time range".format(bad)
         if bad != 0:
             self.logger.info(msg)
+        for d_i in discarded_issues:
+            msg = ("Issue out of tmie range (discarding): ID: {} Timestamp: "
+                   "{}".format(d_i["id"], d_i["tstamp"]))
+            self.logger.debug(msg)
         # Deduplicate
         issues_final = self.deduplicate_issues(issues_filtered)
         return issues_final
