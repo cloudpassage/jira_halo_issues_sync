@@ -1,4 +1,4 @@
-from base_formatter import BaseFormatter
+from .base_formatter import BaseFormatter
 
 
 class FormatterServer(BaseFormatter):
