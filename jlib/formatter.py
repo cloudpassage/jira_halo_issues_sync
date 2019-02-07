@@ -1,14 +1,14 @@
 """Entrypoint for formatting assets, issues, and findings."""
-from logger import Logger
-from formatter_server import FormatterServer
-from formatter_finding_csm import FormatterFindingCSM
-from formatter_finding_fim import FormatterFindingFIM
-from formatter_finding_lids import FormatterFindingLIDS
-from formatter_finding_sva import FormatterFindingSVA
-from formatter_issue_csm import FormatterIssueCSM
-from formatter_issue_fim import FormatterIssueFIM
-from formatter_issue_lids import FormatterIssueLIDS
-from formatter_issue_sva import FormatterIssueSVA
+from .logger import Logger
+from .formatter_finding_csm import FormatterFindingCSM
+from .formatter_finding_fim import FormatterFindingFIM
+from .formatter_finding_lids import FormatterFindingLIDS
+from .formatter_finding_sva import FormatterFindingSVA
+from .formatter_issue_csm import FormatterIssueCSM
+from .formatter_issue_fim import FormatterIssueFIM
+from .formatter_issue_lids import FormatterIssueLIDS
+from .formatter_issue_sva import FormatterIssueSVA
+from .formatter_server import FormatterServer
 
 
 class Formatter(object):
