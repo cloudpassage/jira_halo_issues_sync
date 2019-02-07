@@ -190,28 +190,28 @@ Available Halo fields are:
 
 ### Environment variables
 
-| Variable name            | Purpose                                                                                    |
-|--------------------------|--------------------------------------------------------------------------------------------|
-| CRITICAL_ONLY            | Do not manage Jira issues for non-critical issues. (Default: False)                        |
-| DESCRIBE_ISSUES_THREADS  | Number of Halo issues to enrich from Halo API concurrently. Optional, default 10           |
-| DETERMINATOR_THREADS     | Number of Halo issues to compare against Jira simultaneously. Optional, default 5          |
-| RECONCILER_THREADS       | Number of Halo issues to reconcile to Jira simultaneously. Optional, default 7.            |
-| HALO_API_KEY             | API key ID with auditor permissions.                                                       |
-| HALO_API_SECRET_KEY      | API secret corresponding with HALO_API_KEY.                                                |
-| HALO_API_HOSTNAME        | Hostname for CloudPassage Halo API. Defaults to api.cloudpassage.com.                      |
-| JIRA_API_USER            | Username corresponding to JIRA_API_TOKEN.                                                  |
-| JIRA_API_TOKEN           | API token with access as described in __Jira permissions__, above.                         |
-| JIRA_API_URL             | API URL for Jira instance. (https://my.jira.com)                                           |
-| TIME_RANGE               | Number of minutes since last run of tool. Optional, defaults to 15.                        |
-| JIRA_ISSUE_ID_FIELD      | Name of field in Jira issue for Halo issue ID. Used to prevent duplicate issues in Jira.   |
-| JIRA_FIELD_MAPPING       | (Optional) See __Jira field mapping__, above.                                              |
-| JIRA_FIELD_STATIC        | (Optional) Set static values for fields in Jira issues                                     |
-| JIRA_PROJECT_KEY         | Project key for project where all new issues will be created.                              |
-| ISSUE_REOPEN_TRANSITION  | Use this transition name for reopening Jira issues.                                        |
-| ISSUE_CLOSE_TRANSITION   | Use this transition name for closing Jira issues.                                          |
-| ISSUE_STATUS_CLOSED      | This state is considered closed, but re-openable.                                          |
-| STATUS_HARD_CLOSED       | Optional, comma-separated. If issue status matches, do not reopen, create a new issue.     |
-| JIRA_ISSUE_TYPE          | Type of issue to create (bug, story, etc...).                                              |
-| EXCLUDE_SERVER_SECURE    | Do not manage issues for issues associated with Server Secure. (unsupported in v1)         |
-| EXCLUDE_CONTAINER_SECURE | Do not manage issues for issues associated with Container Secure. (unsupported in v1)      |
-| EXCLUDE_CLOUD_SECURE     | Do not manage issues for issues associated with Cloud Secure. (unsupported in v1)          |
+| Variable name            | Purpose                                                                                           |
+|--------------------------|---------------------------------------------------------------------------------------------------|
+| CRITICAL_ONLY            | Do not manage Jira issues for non-critical issues. (Default: False)                               |
+| DESCRIBE_ISSUES_THREADS  | Number of Halo issues to enrich from Halo API concurrently. Optional, default 10                  |
+| DETERMINATOR_THREADS     | Number of Halo issues to compare against Jira simultaneously. Optional, default 5                 |
+| RECONCILER_THREADS       | Number of Halo issues to reconcile to Jira simultaneously. Optional, default 7.                   |
+| HALO_API_KEY             | API key ID with auditor permissions.                                                              |
+| HALO_API_SECRET_KEY      | API secret corresponding with HALO_API_KEY.                                                       |
+| HALO_API_HOSTNAME        | Hostname for CloudPassage Halo API. Defaults to api.cloudpassage.com.                             |
+| JIRA_API_USER            | Username corresponding to JIRA_API_TOKEN.                                                         |
+| JIRA_API_TOKEN           | API token with access as described in __Jira permissions__, above.                                |
+| JIRA_API_URL             | API URL for Jira instance. (https://my.jira.com)                                                  |
+| TIME_RANGE               | Number of minutes since last run of tool. Optional, defaults to 15.                               |
+| JIRA_ISSUE_ID_FIELD      | Name of field in Jira issue for Halo issue ID. Used to prevent duplicate issues in Jira.          |
+| JIRA_FIELD_MAPPING       | (Optional) See __Jira field mapping__, above. \*                                                  |
+| JIRA_FIELD_STATIC        | (Optional) Set static values for fields in Jira issues                                            |
+| JIRA_PROJECT_KEY         | Project key for project where all new issues will be created.                                     |
+| ISSUE_REOPEN_TRANSITION  | Use this transition name for reopening Jira issues.                                               |
+| ISSUE_CLOSE_TRANSITION   | Use this transition name for closing Jira issues.                                                 |
+| ISSUE_STATUS_CLOSED      | This state is considered closed, but re-openable.                                                 |
+| STATUS_HARD_CLOSED       | Optional, comma-separated. If issue status matches, do not reopen, create a new issue.            |
+| JIRA_ISSUE_TYPE          | Type of issue to create (bug, story, etc...).                                                     |
+| EXCLUDE_SERVER_SECURE    | Do not manage issues for issues associated with Server Secure. (unsupported in v1)                |
+| EXCLUDE_CONTAINER_SECURE | Do not manage issues for issues associated with Container Secure. (unsupported in v1)             |
+| EXCLUDE_CLOUD_SECURE     | Do not manage issues for issues associated with Cloud Secure. (unsupported in v1)                 |

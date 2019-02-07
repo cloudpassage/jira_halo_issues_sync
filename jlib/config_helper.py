@@ -2,9 +2,11 @@
 import datetime
 import os
 import sys
+
+from botocore.exceptions import ClientError
+
 from .logger import Logger
 from .manage_state import ManageState
-from botocore.exceptions import ClientError
 
 
 class ConfigHelper(object):

@@ -1,5 +1,7 @@
 from jira import JIRA
-from logger import Logger
+from jira.exceptions import JIRAError
+
+from .logger import Logger
 
 
 class JiraLocal(object):
@@ -56,8 +58,57 @@ class JiraLocal(object):
                 project=self.default_project_id,
                 issuetype={'name': self.default_issue_type},
                 summary=summary, description=description)
-        new_issue.update(fields=field_mapping)
+        new_issue_fields = [x for x in self.jira_instance.fields()]
+        try:
+            fixed_fields, errors = self.fix_meta_fields(new_issue_fields,
+                                                        field_mapping)
+            if errors:
+                msg = ("Failed to map fields for Jira issue: "
+                       "{}".format(", ".join(errors)))
+                self.log.error(msg)
+            new_issue.update(**fixed_fields)
+        except JIRAError as e:
+            tried = ", ".join([x for x in field_mapping.keys()])
+            allowed = " | ".join(["{} or {}".format(x["id"], x["name"])
+                                  for x in new_issue_fields])
+            msg = ("Failed to update fields on Jira issue {}. "
+                   "Tried: {} Allowed: {} Error message: "
+                   "{}".format(new_issue.key, tried, allowed, e))
+            self.log.error(msg)
+            raise e
         return new_issue.key
+
+    @classmethod
+    def fix_meta_fields(cls, allowed, desired):
+        """Return a dictionary that's usable for updating fields in Jira.
+
+        We go through the list of allowed fields (by ID), then by name,
+        populating the result set. An error message is logged for each field
+        that is not map-able.
+
+        Args:
+            allowed (list): List of dictionaries from the Jira ticket,
+                describing valid fields.
+            desired (dict): Dictionary of desired values for insertion into
+                ticket.
+
+        Returns:
+            tuple: (dict: Dictionary ready for updating Jira fields.,
+                list: Fields that didn't map.)
+        """
+
+        results = {}
+        bad_fields = []
+        valid_ids = {x["id"] for x in allowed}
+        by_field_name = {x["name"]: x["id"] for x in allowed}
+        for k, v in list(desired.items()):
+            if k in valid_ids:
+                results[k] = v
+            elif k in by_field_name:
+                results[by_field_name[k]] = v
+            else:
+                bad_fields.append(k)
+        return results, bad_fields
 
     def comment_jira_issue(self, issue_id, comment):
         """Add a comment to a Jira issue."""

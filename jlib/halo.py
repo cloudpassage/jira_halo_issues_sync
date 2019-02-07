@@ -1,8 +1,10 @@
-import cloudpassage
 import os
-from logger import Logger
 import re
 from multiprocessing.dummy import Pool as ThreadPool
+
+import cloudpassage
+
+from .logger import Logger
 
 
 class Halo(object):
