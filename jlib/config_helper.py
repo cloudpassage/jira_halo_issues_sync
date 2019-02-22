@@ -84,9 +84,9 @@ class ConfigHelper(object):
                     ("aws_ssm_timestamp_param", self.str_from_env),
                     ("time_range", self.int_from_env)]
         self.logger = Logger()
+        self.aws_ssm_timestamp_param = "/CloudPassage-Jira/issues/timestamp"
         self.set_config_from_env()
         self.state_manager = None
-        self.aws_ssm_timestamp_param = "/CloudPassage-Jira/issues/timestamp"
         self.set_timestamp_from_env()
 
     @classmethod
