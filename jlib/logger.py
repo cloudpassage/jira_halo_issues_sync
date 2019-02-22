@@ -1,4 +1,4 @@
-"""Handle all loging here."""
+"""Handle all logging here."""
 import logging
 import os
 

@@ -1,2 +1,2 @@
 boto3
-jira==2.0
+jira==2.0.1.0rc1

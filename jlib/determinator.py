@@ -1,5 +1,5 @@
 """The Determinator class decides what actions to take WRT Jira tickets."""
-from logger import Logger
+from .logger import Logger
 
 
 class Determinator(object):
