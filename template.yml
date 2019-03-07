@@ -19,7 +19,7 @@ Globals:
         HALO_API_SECRET_KEY: NONE
         JIRA_API_USER: "NONE"
         JIRA_API_TOKEN: NONE
-
+        AWS_SSM_TIMESTAMP_PARAM: "/CloudPassage-Jira/issues/timestamp"
 Parameters:
   CodeUriParameter:
     Type: String
@@ -33,4 +33,4 @@ Resources:
               Ref: CodeUriParameter
             Handler: application.lambda_handler
             Runtime: python2.7
-            Timeout: 300
+            Timeout: 600
