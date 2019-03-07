@@ -4,6 +4,7 @@ import os
 import sys
 
 from botocore.exceptions import ClientError
+from botocore.exceptions import ParamValidationError
 
 from .logger import Logger
 from .manage_state import ManageState
@@ -166,6 +167,8 @@ class ConfigHelper(object):
         AWS-SSM configuration for supersedes the TIME_RANGE env var
         setting.
         """
+        msg = "SSM timestamp param: {}".format(self.aws_ssm_timestamp_param)
+        self.logger.info(msg)
         try:
             self.state_manager = ManageState(self.aws_ssm_timestamp_param)
             self.tstamp = self.state_manager.get_timestamp()
@@ -183,4 +186,7 @@ class ConfigHelper(object):
                 sys.exit(1)
             msg = "AWS role configuration issue: {}".format(e)
             self.logger.error(msg)
+            sys.exit(1)
+        except ParamValidationError as e:
+            self.logger.error("SSM Parameter validation failed: {}".format(e))
             sys.exit(1)

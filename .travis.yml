@@ -63,6 +63,9 @@ after_success:
 - python ./cleanup.py
 - python ./cleanup.py
 - python ./cleanup.py
+- python ./cleanup.py
+- python ./cleanup.py
+- python ./cleanup.py
 after_failure: docker run -it --rm -e "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}" -e
   "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}" -e "AWS_REGION=${AWS_REGION}" -e
   "ENVIRONMENT_NAME=${ENVIRONMENT_NAME}" ${TESTING_IMAGE_NAME} deprovision
