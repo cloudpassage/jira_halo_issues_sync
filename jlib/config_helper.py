@@ -65,6 +65,8 @@ class ConfigHelper(object):
                 "reconciler_threads",
                 "time_range"]
 
+    aws_ssm_default = "/CloudPassage-Jira/issues/timestamp"
+
     def __init__(self):
         self.ref = [("critical_only", self.bool_from_env),
                     ("halo_api_key", self.str_from_env),
@@ -82,10 +84,10 @@ class ConfigHelper(object):
                     ("issue_status_closed", self.str_from_env),
                     ("issue_status_hard_closed", self.str_from_env),
                     ("issue_reopen_transition", self.str_from_env),
-                    ("aws_ssm_timestamp_param", self.str_from_env),
                     ("time_range", self.int_from_env)]
         self.logger = Logger()
-        self.aws_ssm_timestamp_param = "/CloudPassage-Jira/issues/timestamp"
+        self.aws_ssm_timestamp_param = os.getenv("AWS_SSM_TIMESTAMP_PARAM",
+                                                 self.aws_ssm_default)
         self.set_config_from_env()
         self.state_manager = None
         self.set_timestamp_from_env()
