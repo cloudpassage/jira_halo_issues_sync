@@ -4,6 +4,7 @@ import os
 import sys
 
 from botocore.exceptions import ClientError
+from botocore.exceptions import ParamValidationError
 
 from .logger import Logger
 from .manage_state import ManageState
@@ -35,6 +36,7 @@ class ConfigHelper(object):
             reopened. Instead, a new Jira issue will be created.
         issue_reopen_transition (str): Reopened issues will be ceated with this
             status.
+        no_comment (bool): If True, don't add comments to existing issues.
         reconciler_threads (int): Maximum number of issues to be simultameously
             recinciled between Halo and Jira.
         state_manager (None or instance of ManageState): This allows us to
@@ -64,6 +66,8 @@ class ConfigHelper(object):
                 "reconciler_threads",
                 "time_range"]
 
+    aws_ssm_default = "/CloudPassage-Jira/issues/timestamp"
+
     def __init__(self):
         self.ref = [("critical_only", self.bool_from_env),
                     ("halo_api_key", self.str_from_env),
@@ -81,10 +85,11 @@ class ConfigHelper(object):
                     ("issue_status_closed", self.str_from_env),
                     ("issue_status_hard_closed", self.str_from_env),
                     ("issue_reopen_transition", self.str_from_env),
-                    ("aws_ssm_timestamp_param", self.str_from_env),
+                    ("no_comment", self.bool_from_env),
                     ("time_range", self.int_from_env)]
         self.logger = Logger()
-        self.aws_ssm_timestamp_param = "/CloudPassage-Jira/issues/timestamp"
+        self.aws_ssm_timestamp_param = os.getenv("AWS_SSM_TIMESTAMP_PARAM",
+                                                 self.aws_ssm_default)
         self.set_config_from_env()
         self.state_manager = None
         self.set_timestamp_from_env()
@@ -166,6 +171,8 @@ class ConfigHelper(object):
         AWS-SSM configuration for supersedes the TIME_RANGE env var
         setting.
         """
+        msg = "SSM timestamp param: {}".format(self.aws_ssm_timestamp_param)
+        self.logger.info(msg)
         try:
             self.state_manager = ManageState(self.aws_ssm_timestamp_param)
             self.tstamp = self.state_manager.get_timestamp()
@@ -183,4 +190,7 @@ class ConfigHelper(object):
                 sys.exit(1)
             msg = "AWS role configuration issue: {}".format(e)
             self.logger.error(msg)
+            sys.exit(1)
+        except ParamValidationError as e:
+            self.logger.error("SSM Parameter validation failed: {}".format(e))
             sys.exit(1)
