@@ -41,6 +41,7 @@ script:
   -e ISSUE_STATUS_CLOSED=closed
   -e DEBUG=True
   -e TIME_RANGE=60
+  -e NO_SVA=True
   testme
 - docker run -it --rm
   -v ${PWD}/JiraHaloIssuesSync/:/var/delivery/
