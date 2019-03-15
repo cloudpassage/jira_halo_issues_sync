@@ -22,7 +22,9 @@ def main():
     msg = "Getting all Halo issues since {}".format(config.tstamp)  # NOQA
     logger.info(msg)
 
-    halo_issues = halo.describe_all_issues(config.tstamp, config.critical_only)
+    issues_filters = {"no_sva": config.no_sva}
+    halo_issues = halo.describe_all_issues(config.tstamp, config.critical_only,
+                                           **issues_filters)
 
     # Bail here if there are no issues to process.
     if not halo_issues:

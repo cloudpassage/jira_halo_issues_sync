@@ -193,7 +193,8 @@ Available Halo fields are:
 | Variable name            | Purpose                                                                                           |
 |--------------------------|---------------------------------------------------------------------------------------------------|
 | CRITICAL_ONLY            | Do not manage Jira issues for non-critical issues. (Default: False)                               |
-| NO_COMMENT               | Do not add comments to already-existing Jira issues.                                              |
+| NO_COMMENT               | (Optional) Do not add comments to already-existing Jira issues.                                   |
+| NO_SVA                   | (Optional) Do not synchronize SVA issues.                                                         |
 | DESCRIBE_ISSUES_THREADS  | Number of Halo issues to enrich from Halo API concurrently. Optional, default 10                  |
 | DETERMINATOR_THREADS     | Number of Halo issues to compare against Jira simultaneously. Optional, default 5                 |
 | RECONCILER_THREADS       | Number of Halo issues to reconcile to Jira simultaneously. Optional, default 7.                   |
