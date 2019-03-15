@@ -30,7 +30,7 @@ class Halo(object):
         self.describe_issues_threads = describe_issues_threads
         return
 
-    def describe_all_issues(self, timestamp, critical_only=True):
+    def describe_all_issues(self, timestamp, critical_only=True, **kwargs):
         """Return list of all isssues since timestamp, described.
 
         This wraps the initial retrieval of all issues touched since timestamp,
@@ -44,6 +44,12 @@ class Halo(object):
             list: List of dictionary objects describing all issues since
                 timestamp.
         """
+        # Create a list of issue types to suppress
+        suppressed_types = []
+        if "no_sva" in kwargs and kwargs["no_sva"] is True:
+            suppressed_types.append("sva")
+            msg = "Not retrieving SVA issues (config item ${NO_SVA} is True)"
+            self.logger.info(msg)
         # Create a set of all issue IDs in scope for this run of the tool.
         all_issue_ids = {x["id"] for x in
                          self.get_issues_touched_since(timestamp,
@@ -56,7 +62,8 @@ class Halo(object):
         results = pool.map(issue_getter, list(all_issue_ids))
         pool.close()
         pool.join()
-        retval = [self.time_label_issue(x) for x in results]
+        retval = [self.time_label_issue(x) for x in results
+                  if x["issue_type"] not in suppressed_types]
         return retval
 
     def describe_asset(self, asset_type, asset_id):
