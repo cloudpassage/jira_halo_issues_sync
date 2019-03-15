@@ -37,6 +37,7 @@ class ConfigHelper(object):
         issue_reopen_transition (str): Reopened issues will be ceated with this
             status.
         no_comment (bool): If True, don't add comments to existing issues.
+        no_sva (bool): If True, don't synchronize SVA issues.
         reconciler_threads (int): Maximum number of issues to be simultameously
             recinciled between Halo and Jira.
         state_manager (None or instance of ManageState): This allows us to
@@ -86,6 +87,7 @@ class ConfigHelper(object):
                     ("issue_status_hard_closed", self.str_from_env),
                     ("issue_reopen_transition", self.str_from_env),
                     ("no_comment", self.bool_from_env),
+                    ("no_sva", self.bool_from_env),
                     ("time_range", self.int_from_env)]
         self.logger = Logger()
         self.aws_ssm_timestamp_param = os.getenv("AWS_SSM_TIMESTAMP_PARAM",

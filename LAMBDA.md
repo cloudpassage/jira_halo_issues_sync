@@ -45,7 +45,8 @@ This will create the Lambda zip archive at
 | STATUS_HARD_CLOSED       | Optional, comma-separated. If issue status matches, do not reopen, create a new issue.                            |
 | JIRA_ISSUE_TYPE          | Type of issue to create (bug, story, etc...).                                                                     |
 | CRITICAL_ONLY            | Do not manage Jira issues for non-critical issues.                                                                |
-| NO_COMMENT               | Do not add comments to already-existing Jira issues.                                                              |
+| NO_COMMENT               | (Optional) Do not add comments to existing Jira issues.                                                           |
+| NO_SVA                   | (Optional) Do not synchronize SVA issues.                                                                         |
 | EXCLUDE_SERVER_SECURE    | Do not manage issues for issues associated with Server Secure. (unsupported in v1)                                |
 | EXCLUDE_CONTAINER_SECURE | Do not manage issues for issues associated with Container Secure. (unsupported in v1)                             |
 | EXCLUDE_CLOUD_SECURE     | Do not manage issues for issues associated with Cloud Secure. (unsupported in v1)                                 |
