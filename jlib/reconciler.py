@@ -79,6 +79,11 @@ class Reconciler(object):
             msg = ("Creating and closing Jira issue for Halo issue "
                    "ID {}".format(issue_id))
         elif action == "comment":
+            if config.no_comment:
+                msg = ("Commenting suppressed in config, skipping Halo issue "
+                       "{}".format(issue_id))
+                logger.info(msg)
+                return
             msg = "Commenting Jira issue for Halo issue ID {}".format(issue_id)
         elif action == "change_status":
             msg = ("Transitioning Jira issue for Halo issue ID "
