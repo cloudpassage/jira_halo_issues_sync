@@ -12,6 +12,8 @@ class Utility(object):
         """Log initial job stats."""
         logger = Logger()
         msgs = []
+        if issues == []:
+            return
         msgs.append("Reconciling {} Halo issues since {}".format(len(issues),
                                                                  tstamp))
         c_time = sorted([x["created_at"] for x in issues])
