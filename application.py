@@ -28,15 +28,15 @@ def main():
     halo_issues = halo.describe_all_issues(config.tstamp, config.critical_only,
                                            **issues_filters)
 
+    # Print initial stats
+    jlib.Utility.print_initial_job_stats(config.tstamp, halo_issues)
+
     # Bail here if there are no issues to process.
     if not halo_issues:
         logger.info("No issues to process!")
         if config.state_manager:
             config.state_manager.set_timestamp(starting_timestamp)
         sys.exit(0)
-
-    # Print initial stats
-    jlib.Utility.print_initial_job_stats(config.tstamp, halo_issues)
 
     # Compare Halo issue IDs against existing Jira issues, to determine
     # what should be created, updated, closed, or reopened.
