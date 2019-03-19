@@ -1,5 +1,6 @@
 #!/usr/bin/python2
 import boto3
+import datetime
 import jlib
 import json
 import os
@@ -9,6 +10,7 @@ from base64 import b64decode
 
 def main():
     logger = jlib.Logger()
+    starting_timestamp = datetime.datetime.now().isoformat()
     # Get config
     config = jlib.ConfigHelper()
     if not config.required_vars_are_set():
@@ -29,6 +31,8 @@ def main():
     # Bail here if there are no issues to process.
     if not halo_issues:
         logger.info("No issues to process!")
+        if config.state_manager:
+            config.state_manager.set_timestamp(starting_timestamp)
         sys.exit(0)
 
     # Print initial stats
