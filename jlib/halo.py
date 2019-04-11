@@ -64,6 +64,10 @@ class Halo(object):
         pool.join()
         retval = [self.time_label_issue(x) for x in results
                   if x["issue_type"] not in suppressed_types]
+        if len(retval) != len(results):
+            msg = "Of {} issues, {} are not filtered out.".format(len(results),
+                                                                  len(retval))
+            self.logger.info(msg)
         return retval
 
     def describe_asset(self, asset_type, asset_id):
