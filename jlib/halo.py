@@ -124,21 +124,21 @@ class Halo(object):
             updated = self.issues.list_all(
                 status="active",
                 critical=True,
-                state="active,inactive,missing,retired",
+                state="active,deactivated,missing,retired",
                 last_seen_at_gte=timestamp)
             resolved = self.issues.list_all(
                 status="resolved",
                 critical=True,
-                state="active,inactive,missing,retired",
+                state="active,deactivated,missing,retired",
                 resolved_at_gte=timestamp)
         else:
             updated = self.issues.list_all(
                 status="active",
-                state="active,inactive,missing,retired",
+                state="active,deactivated,missing,retired",
                 last_seen_at_gte=timestamp)
             resolved = self.issues.list_all(
                 status="resolved",
-                state="active,inactive,missing,retired",
+                state="active,deactivated,missing,retired",
                 resolved_at_gte=timestamp)
         msg = "Active issues: {} Resolved issues: {}.".format(len(updated),
                                                               len(resolved))
