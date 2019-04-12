@@ -77,7 +77,7 @@ class TestIntegrationHalo:
         halo = self.get_halo_object()
         issues_obj = cloudpassage.Issue(halo.session)
         target_issue = issues_obj.list_all(status=["active", "resolved"],
-                                           state=["active", "inactive",
+                                           state=["active", "deactivated",
                                                   "missing", "retired"],
                                            issue_type="sva")[0]
         pprint.pprint(target_issue)
@@ -89,7 +89,7 @@ class TestIntegrationHalo:
         halo = self.get_halo_object()
         issues_obj = cloudpassage.Issue(halo.session)
         target_issue = issues_obj.list_all(status=["active", "resolved"],
-                                           state=["active", "inactive",
+                                           state=["active", "deactivated",
                                                   "missing", "retired"],
                                            issue_type="fim")[0]
         pprint.pprint(target_issue)
@@ -101,7 +101,7 @@ class TestIntegrationHalo:
         halo = self.get_halo_object()
         issues_obj = cloudpassage.Issue(halo.session)
         target_issue = issues_obj.list_all(status=["active", "resolved"],
-                                           state=["active", "inactive",
+                                           state=["active", "deactivated",
                                                   "missing", "retired"],
                                            issue_type="csm")[0]
         pprint.pprint(target_issue)
