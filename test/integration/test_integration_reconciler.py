@@ -33,7 +33,7 @@ class TestIntegrationReconciler:
         target_issue = reconciler.halo.issues.list_all(status=["active",
                                                                "resolved"],
                                                        state=["active",
-                                                              "inactive",
+                                                              "deactivated",
                                                               "missing",
                                                               "retired"])
         full_issue = reconciler.halo.get_issue_full(target_issue[0]["id"])
@@ -48,7 +48,7 @@ class TestIntegrationReconciler:
         target_issue = reconciler.halo.issues.list_all(status=["active",
                                                                "resolved"],
                                                        state=["active",
-                                                              "inactive",
+                                                              "deactivated",
                                                               "missing",
                                                               "retired"])
         full_issue = reconciler.halo.get_issue_full(target_issue[0]["id"])
