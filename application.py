@@ -36,7 +36,9 @@ def main():
         logger.info("No issues to process!")
         if config.state_manager:
             config.state_manager.set_timestamp(starting_timestamp)
-        sys.exit(0)
+        return {"result": json.dumps(
+                    {"message": "Halo/Jira issue sync complete",
+                     "total_issues": 0})}
 
     # Compare Halo issue IDs against existing Jira issues, to determine
     # what should be created, updated, closed, or reopened.
