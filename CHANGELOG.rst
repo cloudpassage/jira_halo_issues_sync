@@ -27,6 +27,12 @@ New
 
 Changes
 ~~~~~~~
+- Corrected tests to use state 'deactivated' [Ash Wilson]
+
+  Closes #65
+- Adding CHANGELOG.rst. [Ash Wilson]
+
+  Closes #62
 - Documenting Jira permissions validation process. [Ash Wilson]
 
   Closes #39
