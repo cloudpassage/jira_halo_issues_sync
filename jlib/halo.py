@@ -121,29 +121,16 @@ class Halo(object):
             dict
         """
         if critical_only:
-            updated = self.issues.list_all(
-                status="active",
+            all_issues = self.issues.list_all(
                 critical=True,
                 state="active,deactivated,missing,retired",
-                last_seen_at_gte=timestamp)
-            resolved = self.issues.list_all(
-                status="resolved",
-                critical=True,
-                state="active,deactivated,missing,retired",
-                resolved_at_gte=timestamp)
+                since=timestamp)
         else:
-            updated = self.issues.list_all(
-                status="active",
+            all_issues = self.issues.list_all(
                 state="active,deactivated,missing,retired",
-                last_seen_at_gte=timestamp)
-            resolved = self.issues.list_all(
-                status="resolved",
-                state="active,deactivated,missing,retired",
-                resolved_at_gte=timestamp)
-        msg = "Active issues: {} Resolved issues: {}.".format(len(updated),
-                                                              len(resolved))
+                since=timestamp)
+        msg = "Issues to process: {}".format(len(all_issues))
         self.logger.info(msg)
-        all_issues = resolved + updated
         labeled = [self.time_label_issue(x) for x in all_issues]
         # Ensure time filtering works
         issues_filtered = [x for x in labeled if

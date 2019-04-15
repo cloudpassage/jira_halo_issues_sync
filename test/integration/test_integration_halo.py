@@ -76,9 +76,9 @@ class TestIntegrationHalo:
     def test_describe_finding_sva(self):
         halo = self.get_halo_object()
         issues_obj = cloudpassage.Issue(halo.session)
-        target_issue = issues_obj.list_all(status=["active", "resolved"],
-                                           state=["active", "deactivated",
+        target_issue = issues_obj.list_all(state=["active", "deactivated",
                                                   "missing", "retired"],
+                                           since=self.get_iso_yesterday(),
                                            issue_type="sva")[0]
         pprint.pprint(target_issue)
         finding_url = halo.get_issue_full(target_issue["id"])["findings"][-1]["finding"]  # NOQA
@@ -88,9 +88,9 @@ class TestIntegrationHalo:
     def test_describe_finding_fim(self):
         halo = self.get_halo_object()
         issues_obj = cloudpassage.Issue(halo.session)
-        target_issue = issues_obj.list_all(status=["active", "resolved"],
-                                           state=["active", "deactivated",
+        target_issue = issues_obj.list_all(state=["active", "deactivated",
                                                   "missing", "retired"],
+                                           since=self.get_iso_yesterday(),
                                            issue_type="fim")[0]
         pprint.pprint(target_issue)
         finding_url = halo.get_issue_full(target_issue["id"])["findings"][-1]["finding"]  # NOQA
@@ -100,9 +100,9 @@ class TestIntegrationHalo:
     def test_describe_finding_csm(self):
         halo = self.get_halo_object()
         issues_obj = cloudpassage.Issue(halo.session)
-        target_issue = issues_obj.list_all(status=["active", "resolved"],
-                                           state=["active", "deactivated",
+        target_issue = issues_obj.list_all(state=["active", "deactivated",
                                                   "missing", "retired"],
+                                           since=self.get_iso_yesterday(),  # NOQA
                                            issue_type="csm")[0]
         pprint.pprint(target_issue)
         finding_url = halo.get_issue_full(target_issue["id"])["findings"][-1]["finding"]  # NOQA
