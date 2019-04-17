@@ -43,9 +43,10 @@ class TestIntegrationFormatter:
 
     def test_formatter_summary(self):
         data = self.load_json_from_file("server.json")
-        formatted = jlib.Formatter.format_summary('server', 'fim', data)
+        formatted = jlib.Formatter.format_summary('server', 'fim', data,
+                                                  {'name': "BAD TIMES"})
         assert formatted is not None
 
     def test_bad_formatter_summary(self):
-        formatted = jlib.Formatter.format_summary('nope', 'nope', {})
+        formatted = jlib.Formatter.format_summary('nope', 'nope', {}, {})
         assert formatted is None
