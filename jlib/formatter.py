@@ -52,10 +52,13 @@ class Formatter(object):
         return formatted
 
     @classmethod
-    def format_summary(cls, asset_type, issue_type, asset_described):
+    def format_summary(cls, asset_type, issue_type,
+                       asset_described, issue_described):
         """Format summary string."""
         if asset_type not in cls.supported_asset_types:
             return None
         elif asset_type == "server":
-            summary = "Halo detected {} issue in server {}".format(issue_type, asset_described["hostname"])  # NOQA
+            summary = ("Halo detected issue in server {} ({}): "
+                       "{}").format(asset_described["hostname"], issue_type,
+                       issue_described["name"])  # NOQA
             return summary
