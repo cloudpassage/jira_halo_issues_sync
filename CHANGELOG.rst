@@ -2,8 +2,18 @@ Changelog
 =========
 
 
-v1.0
+v1.1
 ----
+
+Changes
+~~~~~~~
+- Jira issue summary now includes Halo issue name. [Ash Wilson]
+
+  Closes #64
+
+
+v1.0 (2019-04-15)
+-----------------
 
 New
 ~~~
