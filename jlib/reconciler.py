@@ -139,7 +139,7 @@ class Reconciler(object):
         finding_formatted = Formatter.format_object("finding", issue_type,
                                                     finding_described)
         summary = Formatter.format_summary(asset_type, issue_type,
-                                           asset_described)
+                                           asset_described, issue_described)
         description = "\n----\n".join([finding_formatted, asset_formatted,
                                        issue_formatted])
         halo_issue_id = issue_described["id"]
