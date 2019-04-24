@@ -37,7 +37,12 @@ class Utility(object):
     @classmethod
     def get_marching_orders(cls, config, issue_list):
             """Map Halo issue IDs to thread pool for checking Jira issues."""
-            packed_list = [(config, x) for x in issue_list]
+            jira = JiraLocal(config.jira_api_url, config.jira_api_user,
+                             config.jira_api_token,
+                             config.jira_issue_id_field,
+                             config.jira_project_key,
+                             config.jira_issue_type)
+            packed_list = [{"jira": jira, "halo": x} for x in issue_list]
             determinator = Determinator(config.issue_status_closed,
                                         config.issue_close_transition,
                                         config.issue_status_hard_closed,
@@ -56,19 +61,16 @@ class Utility(object):
             return marching_orders
 
     @classmethod
-    def jira_issue_correlator(cls, get_tup):
+    def jira_issue_correlator(cls, bundle):
         """Gets Jira issues related to a Halo issue ID.
         Args:
-            get_tup(tuple): First item in tuple is the config object.  The
-                second is the Halo issue object of interest.
+            bundle(dict): Dictionary with two keys, ``jira`` and ``halo``. The
+                ``jira``'s value' references an instance of the Jira object,
+                and ``halo``'s value contains Halo issue information.
         Returns:
             dict: Halo issue information
         """
-        config, halo_issue = get_tup
-        jira = JiraLocal(config.jira_api_url, config.jira_api_user,
-                         config.jira_api_token,
-                         config.jira_issue_id_field,
-                         config.jira_project_key,
-                         config.jira_issue_type)
+        jira = bundle["jira"]
+        halo_issue = bundle["halo"]
         jira_related = jira.get_jira_issues_for_halo_issue(halo_issue["id"])
         return {"halo": halo_issue, "jira": jira_related}
