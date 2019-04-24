@@ -34,14 +34,27 @@ class Reconciler(object):
     @classmethod
     def reconcile_marching_orders(cls, config, orders_dict):
         batch_size = config.reconciler_threads * 2
+        halo = Halo(config.halo_api_key, config.halo_api_secret_key,
+                    config.halo_api_hostname, config.describe_issues_threads)
+        jira = JiraLocal(config.jira_api_url, config.jira_api_user,
+                         config.jira_api_token,
+                         config.jira_issue_id_field,
+                         config.jira_project_key,
+                         config.jira_issue_type)
         marching_orders = list(orders_dict.items())
         ordered_actions = sorted(marching_orders, key=cls.get_tstamp)
-        packed_list = [(config, x) for x in ordered_actions]
+        packed_list = [{"config": config,
+                        "issue_id": x[0],
+                        "halo": halo,
+                        "jira": jira,
+                        "other": x[1]}.copy()
+                       for x in ordered_actions]
         reconciler_helper = cls.reconcile_issue
         while packed_list:
             this_batch = packed_list[:batch_size]
             del packed_list[:batch_size]
-            batch_timestamp = cls.get_tstamp(this_batch[-1][1])
+            last_in_batch = this_batch[-1].copy()
+            batch_timestamp = cls.get_tstamp_from_packed(last_in_batch)
             pool = ThreadPool(config.reconciler_threads)
             pool.map(reconciler_helper, this_batch)
             pool.close()
@@ -55,21 +68,28 @@ class Reconciler(object):
     @classmethod
     def get_tstamp(cls, order):
         """Return the tstamp from the 'halo' section of a marching order."""
-        result = order[1]["halo"]["tstamp"]
-        return result
+        return order[1]["halo"]["tstamp"]
+
+    @classmethod
+    def get_tstamp_from_packed(cls, packed):
+        """Return the tstamp from the 'halo' section of a packed action."""
+        return packed["other"]["halo"]["tstamp"]
 
     @classmethod
     def reconcile_issue(cls, reconcile_bundle):
-        config, item = reconcile_bundle
-        issue_id, other = item
+        """Reconcile Halo issue lifecycle state with Jira.
+
+        Args:
+            reconcile_bundle (dict): Dictionary with the following keys:
+                ``config``, ``issue_id``, ``halo``, ``jira``, ``other``.
+
+        """
+        config = reconcile_bundle["config"]
+        issue_id = reconcile_bundle["issue_id"]
+        halo = reconcile_bundle["halo"]
+        jira = reconcile_bundle["jira"]
+        other = reconcile_bundle["other"]
         logger = Logger()
-        halo = Halo(config.halo_api_key, config.halo_api_secret_key,
-                    config.halo_api_hostname, config.describe_issues_threads)
-        jira = JiraLocal(config.jira_api_url, config.jira_api_user,
-                         config.jira_api_token,
-                         config.jira_issue_id_field,
-                         config.jira_project_key,
-                         config.jira_issue_type)
         reconciler = cls(halo, jira, config.jira_field_mapping,
                          config.jira_field_static)
         action = other["disposition"][0]
