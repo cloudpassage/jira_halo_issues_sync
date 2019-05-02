@@ -62,7 +62,8 @@ class Halo(object):
         results = pool.map(issue_getter, list(all_issue_ids))
         pool.close()
         pool.join()
-        retval = [self.time_label_issue(x) for x in results
+        results_cleaned = [x for x in results if x is not None]
+        retval = [self.time_label_issue(x) for x in results_cleaned
                   if x["issue_type"] not in suppressed_types]
         if len(retval) != len(results):
             msg = "Of {} issues, {} are not filtered out.".format(len(results),
@@ -107,7 +108,10 @@ class Halo(object):
 
     def get_issue_full(self, issue_id):
         """Get entire issue body."""
-        return self.issues.describe(issue_id)
+        try:
+            return self.issues.describe(issue_id)
+        except cloudpassage.CloudPassageResourceExistence:
+            return None
 
     def get_issues_touched_since(self, timestamp, critical_only=True):
         """Return all issues created,resolved, or last seen since timestamp.
