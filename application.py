@@ -18,7 +18,8 @@ def main():
 
     # Create objects we'll interact with later
     halo = jlib.Halo(config.halo_api_key, config.halo_api_secret_key,
-                     config.halo_api_hostname, config.describe_issues_threads)
+                     config.halo_api_hostname, config.describe_issues_threads,
+                     config.issue_sync_max)
 
     # Get issues created, changed, deleted since starting timestamp
     msg = "Getting all Halo issues since {}".format(config.tstamp)  # NOQA
