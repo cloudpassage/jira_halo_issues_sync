@@ -28,6 +28,7 @@ This will create the Lambda zip archive at
 | Variable name            | Purpose                                                                                                           |
 |--------------------------|-------------------------------------------------------------------------------------------------------------------|
 | AWS_SSM_TIMESTAMP_PARAM  | SSM param for storing timestamp between invocations. Optional, defaults to `/CloudPassage-Jira/issues/timestamp`  |
+| ISSUE_SYNC_MAX           | Limit the number of issues synchronized this invocation.                                                          |
 | HALO_API_KEY             | API key ID with auditor permissions.                                                                              |
 | HALO_API_SECRET_KEY      | API secret corresponding with HALO_API_KEY.                                                                       |
 | HALO_API_HOSTNAME        | Hostname for CloudPassage Halo API.                                                                               |
