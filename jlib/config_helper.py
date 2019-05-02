@@ -21,6 +21,7 @@ class ConfigHelper(object):
         halo_api_key (str): Auditor API key for CloudPassage Halo.
         halo_api_secret_key (str): Halo API secret.
         halo_api_hostname (str): Halo API hostname.
+        issue_sync_max (int): Maximum number of issues to synchronize.
         jira_api_token (str): API token for Jira.
         jira_api_url (str): URL for Jira API.
         jira_field_static (dict): Fields to statically populate in Jira.
@@ -83,6 +84,7 @@ class ConfigHelper(object):
                     ("jira_project_key", self.str_from_env),
                     ("jira_issue_type", self.str_from_env),
                     ("issue_close_transition", self.str_from_env),
+                    ("issue_sync_max", self.int_from_env),
                     ("issue_status_closed", self.str_from_env),
                     ("issue_status_hard_closed", self.str_from_env),
                     ("issue_reopen_transition", self.str_from_env),
