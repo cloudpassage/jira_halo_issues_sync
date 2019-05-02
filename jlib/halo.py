@@ -1,6 +1,7 @@
 import os
 import re
 from multiprocessing.dummy import Pool as ThreadPool
+from operator import itemgetter
 
 import cloudpassage
 
@@ -8,7 +9,8 @@ from .logger import Logger
 
 
 class Halo(object):
-    def __init__(self, key, secret, api_host, describe_issues_threads):
+    def __init__(self, key, secret, api_host, describe_issues_threads,
+                 issue_sync_max=0):
         """Instantiate with key, secret, and API host.
 
         Args:
@@ -28,6 +30,10 @@ class Halo(object):
             self.logger.critical("\nBad Halo API credentials!\n")
             raise e
         self.describe_issues_threads = describe_issues_threads
+        if issue_sync_max != 0:
+            self.issue_sync_max = issue_sync_max
+        else:
+            self.issue_sync_max = 2000
         return
 
     def describe_all_issues(self, timestamp, critical_only=True, **kwargs):
@@ -150,7 +156,18 @@ class Halo(object):
                    "{}".format(d_i["id"], d_i["tstamp"]))
             self.logger.debug(msg)
         # Deduplicate
-        issues_final = self.deduplicate_issues(issues_filtered)
+        issues_dedup = self.deduplicate_issues(issues_filtered)
+        issues_time_sorted = [x for x in sorted(issues_dedup,
+                                                key=itemgetter("tstamp"))]
+        issues_final = issues_time_sorted[:self.issue_sync_max]
+        limit_discarded = len(issues_time_sorted) - len(issues_final)
+        msg = ("Limiting sync to {} issues, discarding {} of "
+               "{}").format(self.issue_sync_max, limit_discarded,
+                            len(issues_time_sorted))
+        if limit_discarded:
+            self.logger.warn(msg)
+        else:
+            self.logger.debug(msg)
         return issues_final
 
     @classmethod

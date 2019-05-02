@@ -19,6 +19,7 @@ Globals:
         HALO_API_SECRET_KEY: NONE
         JIRA_API_USER: "NONE"
         JIRA_API_TOKEN: NONE
+        ISSUE_SYNC_MAX: 500
         AWS_SSM_TIMESTAMP_PARAM: "/CloudPassage-Jira/issues/timestamp"
 Parameters:
   CodeUriParameter:
