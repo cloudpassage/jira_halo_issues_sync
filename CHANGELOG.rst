@@ -2,6 +2,17 @@ Changelog
 =========
 
 
+v1.2
+----
+
+New
+~~~
+- Added ${ISSUE_SYNC_MAX} to limit issues reconciled per invocation.
+  [Ash Wilson]
+
+  Closes #78
+
+
 v1.1 (2019-04-17)
 -----------------
 
