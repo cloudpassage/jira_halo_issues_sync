@@ -47,3 +47,17 @@ class TestIntegrationMapper:
         result = jlib.Mapper.map_fields(dynamic, static, asset, issue)
         print(result)
         assert result["jira_field_1"] == "halo_field_1"
+
+    def test_mapper_missing_attribute_1(self):
+        """Test with missing server attribute."""
+        dynamic = {"asset_group_name": "jira_field_whatever1assetgroup",
+                   "asset_group_path": "dead_field",
+                   "issue_type": "jirafield_issue_type",
+                   "policy_name": "dead_policy_name_field"}
+        static = {"jira_field_1": "halo_field_1"}
+        asset = self.get_json_from_file("server_missing_attribute.json")
+        issue = self.get_json_from_file("server_sva_issue_created_describe_missing_attribute.json")  # NOQA
+        result = jlib.Mapper.map_fields(dynamic, static, asset, issue)
+        print(result)
+        assert result["jira_field_1"] == "halo_field_1"
+        assert result["jirafield_issue_type"] == "sva"
