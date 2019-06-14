@@ -1,3 +1,6 @@
+from .logger import Logger
+
+
 class Mapper(object):
     @classmethod
     def map_fields(cls, dynamic_mapping, static_mapping, asset_described,
@@ -10,6 +13,7 @@ class Mapper(object):
 
     @classmethod
     def get_dynamic_mapping(cls, dyn_mapping, asset, issue):
+        logger = Logger()
         retval = {}
         asset_type = cls.determine_asset_type(asset)
         server_mapping = {"asset_group_name": "group_name",
@@ -31,10 +35,19 @@ class Mapper(object):
             for k, v in dyn_mapping.items():
                 if k not in server_mapping:
                     pass
+                elif server_mapping[k] not in issue:
+                    msg = ("Mapper: Unable to map {} "
+                           "for {}".format(k, issue["id"]))
+                    logger.warn(msg)
+                    pass
                 else:
                     retval[v] = asset[server_mapping[k]]
         for k, v in dyn_mapping.items():
             if k not in issue_mapping:
+                pass
+            elif issue_mapping[k] not in issue:
+                msg = "Mapper: Unable to map {} for {}".format(k, issue["id"])
+                logger.warn(msg)
                 pass
             else:
                 retval[v] = issue[issue_mapping[k]]
