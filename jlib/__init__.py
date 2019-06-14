@@ -18,5 +18,5 @@ from .reconciler import Reconciler  # NOQA
 from .utility import Utility  # NOQA
 
 
-__version__ = "1.2"
+__version__ = "1.2.1"
 __author__ = "toolbox@cloudpassage.com"

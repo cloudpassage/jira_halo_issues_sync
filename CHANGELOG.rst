@@ -2,8 +2,18 @@ Changelog
 =========
 
 
-v1.2
-----
+v1.2.1
+------
+
+Fix
+~~~
+- Don't fail on missing mapped metadata field. [Ash Wilson]
+
+  Closes #83
+
+
+v1.2 (2019-05-02)
+-----------------
 
 New
 ~~~
