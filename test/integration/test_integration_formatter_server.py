@@ -11,8 +11,8 @@ class TestIntegrationFormatterServer:
     def generate_halo_server_meta(self):
         """Return Halo server json."""
         with open(os.path.join(fixtures_dir, "server.json"), 'r') as j_f:
-            issue = json.load(j_f)
-        return issue
+            svr = json.load(j_f)
+        return svr
 
     def test_format_end_to_end(self):
         server_json = self.generate_halo_server_meta()

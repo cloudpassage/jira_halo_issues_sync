@@ -1,0 +1,72 @@
+{
+  "created_at": "2018-10-31T03:34:50.869Z",
+  "id": "ec73314edcbd11e8aba441a897e246ee",
+  "url": "https://portal.cloudpassage.com/v1/servers/ec73314edcbd11e8aba441a897e246ee",
+  "hostname": "ip-10-98-0-73",
+  "server_label": null,
+  "reported_fqdn": "ip-10-98-0-73.us-west-2.compute.internal",
+  "primary_ip_address": "10.98.0.73",
+  "connecting_ip_address": "18.237.220.196",
+  "state": "deactivated",
+  "daemon_version": "4.2.4",
+  "read_only": false,
+  "platform": "redhat",
+  "platform_version": "7.5",
+  "os_version": "3.10.0-862.el7.x86_64",
+  "kernel_name": "Linux",
+  "kernel_machine": "x86_64",
+  "self_verification_failed": false,
+  "connecting_ip_fqdn": "ec2-18-237-220-196.us-west-2.compute.amazonaws.com",
+  "last_state_change": "2018-10-31T04:10:15.687Z",
+  "docker_inspection": "Disabled",
+  "group_id": "6ef64f6cab0311e890737b9e592e55bd",
+  "group_name": "cloudpassage/cloudpassage-halo-python-sdk",
+  "firewall_policy": {
+    "id": "badc9c6eab0411e89a702f3b0c4667fb",
+    "name": "noaccess-lin",
+    "status": "active",
+    "last_checked": "2018-10-31T03:50:53.767Z",
+    "installed": "2018-10-31T03:35:53.479Z",
+    "url": "https://portal.cloudpassage.com/v1/firewall_policies/badc9c6eab0411e89a702f3b0c4667fb"
+  },
+  "interfaces": [
+    {
+      "name": "eth0",
+      "ip_address": "FE80::8C4:66FF:FE7E:E4A/64",
+      "netmask": "",
+      "mac_address": null
+    },
+    {
+      "name": "eth0",
+      "ip_address": "10.98.0.73",
+      "netmask": "255.255.255.0",
+      "mac_address": null
+    }
+  ],
+  "aws_ec2": {
+    "ec2_instance_id": "i-0ef262e1d11536bb9",
+    "ec2_account_id": "070993360385",
+    "ec2_kernel_id": null,
+    "ec2_image_id": "ami-28e07e50",
+    "ec2_availability_zone": "us-west-2c",
+    "ec2_region": "us-west-2",
+    "ec2_private_ip": "10.98.0.73",
+    "ec2_instance_type": "t2.micro",
+    "ec2_security_groups": [
+      "SDK-InstanceSecurityGroup-BPF4QWA25QD2"
+    ]
+  },
+  "csp_provider": "aws_ec2",
+  "csp_account_id": "070993360385",
+  "csp_availability_zone": "us-west-2c",
+  "csp_image_id": "ami-28e07e50",
+  "csp_instance_id": "i-0ef262e1d11536bb9",
+  "csp_instance_type": "t2.micro",
+  "csp_kernel_id": null,
+  "csp_private_ip": "10.98.0.73",
+  "csp_region": "us-west-2",
+  "csp_security_groups": [
+    "SDK-InstanceSecurityGroup-BPF4QWA25QD2"
+  ],
+  "csp_instance_tags": []
+}
