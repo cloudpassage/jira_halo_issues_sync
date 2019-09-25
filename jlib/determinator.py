@@ -16,7 +16,7 @@ class Determinator(object):
 
     """
 
-    supported_types = ["sva", "csm", "fim", "lids"]
+    supported_types = ["lids", "csm", "fim", "sva", "sam", "fw", "agent", "image_sva"]
 
     def __init__(self, issue_status_closed, issue_close_transition,
                  issue_status_hard_closed, issue_reopen_transition):
@@ -54,9 +54,9 @@ class Determinator(object):
 
         """
 
-        if halo_issue["issue_type"] not in self.supported_types:
+        if halo_issue["type"] not in self.supported_types:
             msg = "Unsupported type {}: {}".format(halo_issue["id"],
-                                                   halo_issue["issue_type"])
+                                                   halo_issue["type"])
             self.logger.warn(msg)
             result = ("nothing", None)
         elif self.create(halo_issue, jira_tickets):

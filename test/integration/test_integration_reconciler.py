@@ -40,7 +40,7 @@ class TestIntegrationReconciler:
                                                               "missing",
                                                               "retired"],
                                                        since=self.get_iso_yesterday())  # NOQA
-        full_issue = reconciler.halo.get_issue_full(target_issue[0]["id"])
+        full_issue = reconciler.halo.get_issue_full(target_issue[0]["id"])['issue']
         issue_key = reconciler.create(full_issue)
         reconciler.comment(full_issue, issue_key)
         reconciler.change_status(issue_key,
@@ -54,7 +54,7 @@ class TestIntegrationReconciler:
                                                               "missing",
                                                               "retired"],
                                                        since=self.get_iso_yesterday())  # NOQA
-        full_issue = reconciler.halo.get_issue_full(target_issue[0]["id"])
+        full_issue = reconciler.halo.get_issue_full(target_issue[0]["id"])['issue']
         reconciler.create_closed(full_issue,
                                  os.getenv("ISSUE_CLOSE_TRANSITION"))
         assert True

@@ -25,9 +25,8 @@ Issues which have been prematurely closed will be re-opened if the Halo issue
 still exists, and issues which are re-opened will cause the corresponding Jira
 issue to re-open.
 
-Version 1 of this integration will only support issues associated with the
-CloudPassage Halo ServerSecure module (FIM, CSM, SVM, LIDS). Future versions
-may support ContainerSecure- and CloudSecure-related issues.
+Version 2 of this integration will support issues associated with the
+CloudPassage Halo ServerSecure, ContainerSecure, and CloudSecure-related issues.
 
 ## How it works
 
@@ -164,29 +163,34 @@ in each of the projects where a Halo issue may be migrated.
 
 Mapping Halo issues to Jira fields can be accomplished by setting and passing
 the ${JIRA_FIELD_MAPPING} into the container. This field should be formatted
-like this: `halo_field_1:jira_field_1;halo_field_2:jira_field_2`. Similarly,
-the ${JIRA_FIELD_STATIC} mapping separates keys from values with a colon (:)
+like this: `halo_field_1:jira_field_1;halo_field_2:jira_field_2` (Note: semicolons must be escaped). 
+Similarly, the ${JIRA_FIELD_STATIC} mapping separates keys from values with a colon (:)
 and separates key/value pairs with a semicolon (;).
 
 Available Halo fields are:
 
 | Halo field             | Purpose                                                                                                   |
 |------------------------|-----------------------------------------------------------------------------------------------------------|
-| asset_group_name       | Name of Halo group containing the asset.                                                                  |
-| asset_group_path       | Halo group path for asset associated with this issue.                                                     |
-| asset_type             | Server, Container, CSP Asset. Currently, only Server is supported.                                        |
+| issue_name             | The display name of the issue in Halo; for example, Vulnerable package: systemd.x86_64.                   |
+| issue_source           | The product that generated the issue in Halo; that is, server_secure, cloud_secure, container_secure.     |
+| issue_group_name       | The Halo display name of the group to which the asset belongs; for example, Docker Hosts                  |
 | issue_critical         | `True` or `False`.                                                                                        |
-| issue_created_at       | ISO8601 timestamp for when issue was first created.                                                       |
-| issue_rule_key         | issue_type::rule_number::rule_name. See {here](https://api-doc.cloudpassage.com/help#issues) for details. |
-| issue_type             | lids, csm, fim, sva, sam, fw, or agent.                                                                   |
-| issue_id               | Unique ID of this issue                                                                                   |
+| issue_first_seen_at    | The date-time (in ISO 8601 format) of the most recent scan in which the issue was first detected.                                                       |
+| issue_last_seen_at     | The date-time (in ISO 8601 format) of the most recent scan in which the issue was last detected.                                                       |
+| issue_resolved_at      | The date-time (in ISO 8601 format) at which the issue was resolved. The value is null for active issues.                                                        |
+| issue_status           | The status of the issue: active or resolved. 
+| issue_csp_rule_id      | The friendly name of the CSP rule                                       |
+| issue_type             | lids, csm, fim, sva, sam, fw, agent, or image_sva                                                              |
 | issue_policy_name      | Name of Halo policy associated with this issue.                                                           |
-| server_csp_provider    | Name of CSP provider, as detected by Halo agent                                                           |
-| server_csp_account_id  | CSP Account ID, as detected by Halo agent                                                                 |
-| server_csp_instance_id | CSP instance ID, as detected by Halo agent                                                                |
-| server_id              | Halo Server ID                                                                                            |
-| server_hostname        | Hostname for server, as detected by Halo agent.                                                           |
-| server_state           | State of host, as reported by Halo agent.                                                                 |
+| issue_csp_account_type    | IaaS platform in which the asset exists                                                           |
+| issue_csp_account_id  | The unique identifier of the CSP account in which the asset exists (external id)                                                                 |
+| issue_csp_resource_id | The unique identifier of the asset in the CSP account                                                                |
+| issue_csp_account_name  | The Halo name of the cloud service provider account.                                                                  |
+| issue_csp_region       | The region in which the cloud service provider account exists; for example, eastus.                                                                  |
+| issue_csp_service_type      | The type of cloud service; for example, IAM, S3, EC2, and so on                                                                  |
+| issue_asset_id              | The Halo unique identifier of the affected asset                                                                                            |
+| issue_asset_name        | The name of the affected asset                                                           |
+| issue_asset_type           | The type of the asset affected. Includes: user, ami, instance, policy, virtual machine, security_group, server                                                                 |
 
 ### Environment variables
 
