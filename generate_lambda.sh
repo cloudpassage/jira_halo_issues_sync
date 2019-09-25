@@ -11,7 +11,7 @@ apt-get update && apt-get install -y curl zip
 
 # First, we add the SDK version that's installed in the container image
 # to the requirements.txt file.
-export HALO_SDK_VERSION=`pip list | grep cloudpassage | awk '{print $2}' | sed -E 's/(\(|\))//g'`
+export HALO_SDK_VERSION=`pip3 list | grep cloudpassage | awk '{print $2}' | sed -E 's/(\(|\))//g'`
 echo "cloudpassage==${HALO_SDK_VERSION}" >> /src/jira_halo_issues_sync/requirements.txt
 
 # Fix pip
