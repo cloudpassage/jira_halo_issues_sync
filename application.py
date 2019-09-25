@@ -5,6 +5,7 @@ import jlib
 import json
 import os
 import sys
+import binascii
 from base64 import b64decode
 
 
@@ -69,7 +70,7 @@ def lambda_handler(event, context):
             os.environ[encrypted_var] = decrypted_value
             msg = "Set var {} to decrypted value with length {}".format(encrypted_var, len(decrypted_value))  # NOQA
             logger.warn(msg)
-        except (kms.exceptions.InvalidCiphertextException, TypeError) as e:
+        except (kms.exceptions.InvalidCiphertextException, binascii.Error) as e:
             msg = "Error decrypting {} with KMS, will try plaintext: {}".format(encrypted_var, e)  # NOQA
             logger.error(msg)
     return main()
