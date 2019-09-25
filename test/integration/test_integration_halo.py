@@ -25,11 +25,6 @@ class TestIntegrationHalo:
         with pytest.raises(cloudpassage.CloudPassageAuthentication):
             jlib.Halo(key, secret, api_host, 10)
 
-    def test_get_unsupported_asset_type(self):
-        halo = self.get_halo_object()
-        result = halo.describe_asset("nonexistent", "12345")
-        assert result == {}
-
     def test_describe_asset_server(self):
         """Requires one server in the account."""
         asset_type = 'server'
@@ -37,8 +32,8 @@ class TestIntegrationHalo:
         halo_server_object = cloudpassage.Server(halo_obj.session)
         state = "active,missing,deactivated"
         query_result = halo_server_object.list_all(state=state)
-        one_server_id = query_result[0]["id"]
-        result = halo_obj.describe_asset(asset_type, one_server_id)
+        one_server_url = query_result[0]['url']
+        result = halo_obj.describe(one_server_url)
         assert result != {}
         assert "id" in result
 
@@ -70,43 +65,34 @@ class TestIntegrationHalo:
         """Unrecognized URL."""
         url = "/v2/someotherthing"
         halo = self.get_halo_object()
-        result = halo.describe_finding(url)
+        result = halo.describe(url)
         assert result is None
 
-    def test_describe_finding_sva(self):
+    def test_describe_issue(self):
         halo = self.get_halo_object()
-        issues_obj = cloudpassage.Issue(halo.session)
-        target_issue = issues_obj.list_all(state=["active", "deactivated",
-                                                  "missing", "retired"],
-                                           since=self.get_iso_yesterday(),
-                                           issue_type="sva")[0]
+        issues_obj = cloudpassage.Issue(halo.session, endpoint_version=3)
+        target_issue = issues_obj.list_all()[0]
         pprint.pprint(target_issue)
-        finding_url = halo.get_issue_full(target_issue["id"])["findings"][-1]["finding"]  # NOQA
-        result = halo.describe_finding(finding_url)
+        issue_url = target_issue["url"]
+        result = halo.describe(issue_url)
         assert result is not None
 
-    def test_describe_finding_fim(self):
+    def test_describe_finding(self):
         halo = self.get_halo_object()
-        issues_obj = cloudpassage.Issue(halo.session)
-        target_issue = issues_obj.list_all(state=["active", "deactivated",
-                                                  "missing", "retired"],
-                                           since=self.get_iso_yesterday(),
-                                           issue_type="fim")[0]
+        issues_obj = cloudpassage.Issue(halo.session, endpoint_version=3)
+        target_issue = issues_obj.list_all()[0]
         pprint.pprint(target_issue)
-        finding_url = halo.get_issue_full(target_issue["id"])["findings"][-1]["finding"]  # NOQA
-        result = halo.describe_finding(finding_url)
+        finding_url = target_issue["last_finding_urls"][-1]
+        result = halo.describe(finding_url)
         assert result is not None
 
-    def test_describe_finding_csm(self):
+    def test_describe_asset(self):
         halo = self.get_halo_object()
-        issues_obj = cloudpassage.Issue(halo.session)
-        target_issue = issues_obj.list_all(state=["active", "deactivated",
-                                                  "missing", "retired"],
-                                           since=self.get_iso_yesterday(),  # NOQA
-                                           issue_type="csm")[0]
+        issues_obj = cloudpassage.Issue(halo.session, endpoint_version=3)
+        target_issue = issues_obj.list_all()[0]
         pprint.pprint(target_issue)
-        finding_url = halo.get_issue_full(target_issue["id"])["findings"][-1]["finding"]  # NOQA
-        result = halo.describe_finding(finding_url)
+        asset_url = target_issue["asset_url"]
+        result = halo.describe(asset_url)
         assert result is not None
 
     def test_deduplicate_issues(self):

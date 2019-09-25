@@ -22,7 +22,7 @@ class Halo(object):
         integration = self.get_integration_string()
         self.session = cloudpassage.HaloSession(key, secret, api_host=api_host,
                                                 integration_string=integration)
-        self.issues = cloudpassage.Issue(self.session)
+        self.issues = cloudpassage.Issue(self.session, endpoint_version=3)
         self.http_helper = cloudpassage.HttpHelper(self.session)
         try:
             self.session.authenticate_client()
@@ -68,45 +68,36 @@ class Halo(object):
         results = pool.map(issue_getter, list(all_issue_ids))
         pool.close()
         pool.join()
-        results_cleaned = [x for x in results if x is not None]
+        results_cleaned = [x['issue'] for x in results if x is not None]
         retval = [self.time_label_issue(x) for x in results_cleaned
-                  if x["issue_type"] not in suppressed_types]
+                  if x["type"] not in suppressed_types]
         if len(retval) != len(results):
             msg = "Of {} issues, {} are not filtered out.".format(len(results),
                                                                   len(retval))
             self.logger.info(msg)
         return retval
 
-    def describe_asset(self, asset_type, asset_id):
+    def describe(self, url):
         """Get full json description of asset."""
-        supported_assets = {"server": cloudpassage.Server}
+        h_h = cloudpassage.HttpHelper(self.session)
         try:
-            asset_obj = supported_assets[asset_type](self.session)
-            return asset_obj.describe(asset_id)
-        except KeyError:
-            msg = "Unsupported asset type: {}".format(asset_type)
-            self.logger.error(msg)
-            return {}
+            short_url = '/' + '/'.join(url.split('/')[3:])
+            object_type = url.split('/')[3:][-2][:-1]
+        except IndexError:
+            self.logger.error("Invalid URL:" + url)
+            return None
 
-    def describe_finding(self, finding_url):
-        """Wrap functionality to get findings for scan and event findings."""
-        if "/scans/" in finding_url:
-            scan_id, finding_id = self.parse_finding_url(finding_url)
-            result = self.get_finding(scan_id, finding_id)
-        elif "/events/" in finding_url:
-            event_id = finding_url.split('/')[-1]
-            h_h = cloudpassage.http_helper(self.session)
-            result = h_h.get("/v1/events/{}".format(event_id))
+        response = None
+        try:
+            response = h_h.get(short_url)
+        except cloudpassage.exceptions.CloudPassageBaseException:
+            self.logger.error("Invalid URL: " + url)
+            pass
+        if object_type in response:
+            result = response[object_type]
         else:
-            msg = "Unable to determine finding type: {}".format(finding_url)
-            self.logger.error(msg)
-            result = None
+            result = response
         return result
-
-    def get_finding(self, scan_id, finding_id):
-        """Get finding for finding_id from scan_id."""
-        url = "/v1/scans/{}/findings/{}".format(scan_id, finding_id)
-        return self.http_helper.get(url)
 
     def get_integration_string(self):
         """Return integration string for this tool."""
@@ -179,8 +170,8 @@ class Halo(object):
         resolved_at.
 
         """
-        target_fields = ["created_at", "resolved_at", "last_seen_at"]
-        tstamps = [issue[x] for x in target_fields if issue[x] is not None]
+        target_fields = ["created_at", "resolved_at", "last_seen_at", "updated_at"]
+        tstamps = [issue[x] for x in target_fields if x in issue and issue[x] is not None]
         retval = issue.copy()
         retval["tstamp"] = sorted(tstamps)[-1]  # Grab the newest of all
         return retval
@@ -211,23 +202,3 @@ class Halo(object):
             rx_compiled = re.compile(r"\s*__version__\s*=\s*\"(\S+)\"")
             ver = rx_compiled.search(i_f.read()).group(1)
         return ver
-
-    def parse_finding_url(self, url):
-        """Return scan_id and finding_id from finding url.
-
-        Args:
-            url (str): Finding URL.
-
-        Returns:
-            tuple (scan_id, finding_id) or None, if no match.
-        """
-        rx = r"^https://\w+\.cloudpassage\.com/v\d/scans/[A-Za-z0-9]+/findings/[A-Za-z0-9]+$"  # NOQA
-        if not re.match(rx, url):
-            self.logger.error("Unable to parse finding URL: {}".format(url))
-            return None
-        else:
-            rxtractor = r".*/scans/(?P<scan_id>[A-Za-z0-9]+)/findings/(?P<finding_id>[A-Za-z0-9]+)"  # NOQA
-            result = re.search(rxtractor, url)
-            scan_id, finding_id = (result.group("scan_id"),
-                                   result.group("finding_id"))
-        return (scan_id, finding_id)

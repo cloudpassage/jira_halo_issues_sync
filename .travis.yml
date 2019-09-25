@@ -44,6 +44,8 @@ script:
   -e NO_SVA=True
   testme
 - docker run -it --rm
+  -e LC_ALL=C.UTF-8
+  -e LANG=C.UTF-8
   -v ${PWD}/JiraHaloIssuesSync/:/var/delivery/
   --entrypoint=/bin/sh
   testme

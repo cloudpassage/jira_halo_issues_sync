@@ -11,19 +11,19 @@ apt-get update && apt-get install -y curl zip
 
 # First, we add the SDK version that's installed in the container image
 # to the requirements.txt file.
-export HALO_SDK_VERSION=`pip list | grep cloudpassage | awk '{print $2}' | sed -E 's/(\(|\))//g'`
+export HALO_SDK_VERSION=`pip3 list | grep cloudpassage | awk '{print $2}' | sed -E 's/(\(|\))//g'`
 echo "cloudpassage==${HALO_SDK_VERSION}" >> /src/jira_halo_issues_sync/requirements.txt
 
 # Fix pip
 echo "Fixing pip"
 apt-get remove -y python-pip
 curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-python get-pip.py
+python3 get-pip.py
 rm get-pip.py
 
 # Install requirements
 echo "Installing SAM"
-pip install aws-sam-cli
+pip3 install aws-sam-cli
 
 
 # Bundle it up!

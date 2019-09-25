@@ -1,29 +1,55 @@
 {
-  "comment": "",
+  "id": "80f2df5e-0f77-11e9-b78d-17c524a28aab",
+  "url": "https://api.cloudpassage.com/v3/issues/80f2df5e-0f77-11e9-b78d-17c524a28aab",
+  "rule_key": "csm::3755418::4.1.18 Ensure the audit configuration is immutable",
+  "name": "4.1.18 Ensure the audit configuration is immutable",
+  "type": "csm",
+  "category": "csm",
   "status": "active",
-  "resolved_at": null,
-  "name": "6.2.7 Ensure all users home directories exist",
+  "critical": false,
+  "source": "server_secure",
+  "created_at": "2019-01-03T16:49:15.064559Z",
+  "updated_at": "2019-09-24T19:56:51.262103Z",
+  "first_seen_at": "2019-01-03T16:49:15.064559Z",
+  "last_seen_at": "2019-09-24T19:56:51.261588Z",
+  "policy_id": "edd2c200-0357-11e9-b633-5dc0741d121c",
+  "policy_name": "CIS Benchmark for Amazon Linux v2.1 Sandbox",
+  "rule_name": "4.1.18 Ensure the audit configuration is immutable",
   "findings": [
+    "7ea02ad60f7711e9b78d17c524a28aab::7efeac320f7711e9b78d17c524a28aab::active::2019-01-03T16:49:15.035Z",
     {
-      "finding": "https://api.cloudpassage.com/v1/scans/cb416c00e13811e8a1ee31d06c44c3de/findings/cb654904e13811e8a1ee31d06c44c3de",
-      "issue_created_at": "2018-11-05T20:24:33.528Z",
-      "issue_status": "active"
+      "status": "active",
+      "scan_id": "d0bb7fa2dc9311e9a5cd77577fa9b5bf",
+      "created_at": "2019-09-24T19:56:51.235Z",
+      "finding_id": "6fcbce1cdf0511e999a469ebcd3f3395"
     }
   ],
-  "rule_key": "csm::3330114::6.2.7 Ensure all users home directories exist",
-  "created_at": "2018-11-05T20:24:33.648218Z",
-  "updated_at": "2018-11-05T20:24:33.648218Z",
-  "policy_name": "CIS Benchmark for Ubuntu Linux 16.04 LTS v1.1",
-  "url": "https://api.cloudpassage.com/v1/issues/cea644ece13811e8a1ee31d06c44c3de",
-  "policy_url": "https://api.cloudpassage.com/v1/policies/4dc664e4937011e8b3763b9f5d5b47ba",
-  "critical": false,
-  "agent_id": "57cbf1a8e13511e88de305fcf6ce4c89",
-  "issue_type": "csm",
-  "resolved_by": "",
-  "id": "cea644ece13811e8a1ee31d06c44c3de",
-  "last_seen_at": "2018-11-05T20:24:33.622Z",
-  "group_id": "82790550a57911e88aea41f1795e3a04",
-  "agent_url": "https://api.cloudpassage.com/v1/servers/57cbf1a8e13511e88de305fcf6ce4c89",
-  "os_type": "linux",
-  "policy_id": "4dc664e4937011e8b3763b9f5d5b47ba"
+  "last_finding_urls": [
+    "https://api.cloudpassage.com/v1/scans/d0bb7fa2dc9311e9a5cd77577fa9b5bf/findings/6fcbce1cdf0511e999a469ebcd3f3395"
+  ],
+  "extended_attributes": {
+    "name": "4.1.18 Ensure the audit configuration is immutable",
+    "os_type": "linux"
+  },
+  "asset_id": "4a945000-0f77-11e9-8499-4f78c79701ed",
+  "asset_url": "https://api.cloudpassage.com/v1/servers/4a9450000f7711e984994f78c79701ed",
+  "asset_type": "server",
+  "asset_name": "ip-10-0-0-166",
+  "group_id": "c68c47d4-0357-11e9-9d88-2306bd4658c7",
+  "group_name": "BU01 Docker Hosts",
+  "group_path": "CloudPassage Demo/Docker Clusters/BU01 Docker Hosts",
+  "csp_account_id": "152836050892",
+  "csp_region": "us-west-2",
+  "csp_image_id": "ami-01bbe152bf19d0289",
+  "csp_tags": [
+    {
+      "key": "environment",
+      "value": "production"
+    },
+    {
+      "key": "Name",
+      "value": "halo-aws-s1-ec2-bu01-02"
+    }
+  ],
+  "os_type": "linux"
 }
