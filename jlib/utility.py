@@ -22,12 +22,12 @@ class Utility(object):
         ls_time = sorted([x["last_seen_at"] for x in issues])
         msgs.append("Last seen times between: {} and {}".format(ls_time[0],
                                                                 ls_time[-1]))
-        r_time = sorted([x["resolved_at"] for x in issues])
-        msgs.append("Resolved times between: {} and {}".format(r_time[0],
-                                                               r_time[-1]))
-        for issue_type in ["lids", "csm", "fim", "sva", "sam", "fw", "agent"]:
+        # r_time = sorted([x["resolved_at"] for x in issues])
+        # msgs.append("Resolved times between: {} and {}".format(r_time[0],
+        #                                                        r_time[-1]))
+        for issue_type in ["lids", "csm", "fim", "sva", "sam", "fw", "agent", "image_sva"]:
             count_this_type = [x for x in issues
-                               if x["issue_type"] == issue_type]
+                               if x["type"] == issue_type]
             msgs.append("Issue type {}: {}".format(issue_type,
                                                    len(count_this_type)))
         for msg in msgs:

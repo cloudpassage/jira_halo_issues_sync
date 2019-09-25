@@ -117,7 +117,7 @@ class Reconciler(object):
         """Return tuple (True, ) for success, else (False, "reason")."""
         action, instructions = determination
         issue_id = issue_meta["id"]
-        module = issue_meta["issue_type"]
+        module = issue_meta["type"]
         message = "Halo ID: {}\tModule: {}\tAction: {}".format(issue_id,
                                                                module, action)
         self.logger.info(message)
@@ -142,30 +142,24 @@ class Reconciler(object):
 
     def create(self, issue_described):
         """Create an issue in Jira for corresponding Halo issue."""
-        issue_type = issue_described["issue_type"]
-        # This will be refactored when we support more asset types.
-        asset_type = "server" if "agent_id" in issue_described else "Unrecognized"  # NOQA
-        asset_id = issue_described["agent_id"] if asset_type == "server" else "NONE"  # NOQA
-        asset_described = self.halo.describe_asset(asset_type, asset_id)
-        asset_formatted = Formatter.format_object("asset", "server",
-                                                  asset_described)
+        asset_url = issue_described["asset_url"]  # NOQA
+        asset_described = self.halo.describe(asset_url)
+        asset_type = issue_described['asset_type']
+        asset_formatted = Formatter.format_object(asset_type, asset_described)
 
-        issue_type = issue_described["issue_type"]
-        issue_formatted = Formatter.format_object("issue", issue_type,
-                                                  issue_described)
+        issue_formatted = Formatter.format_object("issue", issue_described)
 
-        finding_meta = issue_described["findings"][-1]
-        finding_described = self.halo.describe_finding(finding_meta["finding"])
-        finding_formatted = Formatter.format_object("finding", issue_type,
-                                                    finding_described)
-        summary = Formatter.format_summary(asset_type, issue_type,
-                                           asset_described, issue_described)
-        description = "\n----\n".join([finding_formatted, asset_formatted,
-                                       issue_formatted])
+        finding_url = issue_described["last_finding_urls"][-1]
+        finding_described = self.halo.describe(finding_url)
+        finding_formatted = Formatter.format_object("finding", finding_described)
+        summary = Formatter.format_summary(issue_described)
+        description = issue_formatted + asset_formatted + finding_formatted
+        # limit description to Jira limit of 32,767 characters
+        description = description[:32759] + '{code}\n\n'
+
         halo_issue_id = issue_described["id"]
         field_mapping = Mapper.map_fields(self.dynamic_mapping,
                                           self.static_mapping,
-                                          asset_described,
                                           issue_described)
         result = self.jira.create_jira_issue(summary, description,
                                              halo_issue_id, field_mapping)
@@ -177,18 +171,12 @@ class Reconciler(object):
         return
 
     def comment(self, issue_described, jira_issue_id):
-        try:
-            issue_type = issue_described["issue_type"]
-            finding_meta = issue_described["findings"][-1]
-        except KeyError as e:
-            msg = ("Unable to parse Halo issue: "
-                   "{}\n{}".format(str(e), str(issue_described)))
-            self.logger.error(msg)
-        finding_described = self.halo.describe_finding(finding_meta["finding"])
-        finding_formatted = Formatter.format_object("finding", issue_type,
-                                                    finding_described)
+        finding_url = issue_described["last_finding_urls"][-1]
+        finding_described = self.halo.describe(finding_url)
+        finding_formatted = Formatter.format_object("finding", finding_described)
+        # limit description to Jira limit of 32,767 characters
+        finding_formatted = finding_formatted[:32759] + '{code}\n\n'
         self.jira.comment_jira_issue(jira_issue_id, finding_formatted)
-
         return
 
     def change_status(self, issue_id, transition):
