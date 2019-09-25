@@ -2,8 +2,16 @@ Changelog
 =========
 
 
-v1.2.1
+v2.0.0
 ------
+
+Changes
+~~~~~~~
+- Add support for v3 issues and upgrade to python3. [Paul Chang]
+
+
+v1.2.1 (2019-06-14)
+-------------------
 
 Fix
 ~~~
