@@ -9,8 +9,7 @@ from .logger import Logger
 
 
 class Halo(object):
-    def __init__(self, key, secret, api_host, describe_issues_threads,
-                 issue_sync_max=0):
+    def __init__(self, key, secret, api_host, describe_issues_threads):
         """Instantiate with key, secret, and API host.
 
         Args:
@@ -30,13 +29,9 @@ class Halo(object):
             self.logger.critical("\nBad Halo API credentials!\n")
             raise e
         self.describe_issues_threads = describe_issues_threads
-        if issue_sync_max != 0:
-            self.issue_sync_max = issue_sync_max
-        else:
-            self.issue_sync_max = 2000
         return
 
-    def describe_all_issues(self, timestamp, critical_only=True, **kwargs):
+    def describe_all_issues(self, timestamp, filters):
         """Return list of all isssues since timestamp, described.
 
         This wraps the initial retrieval of all issues touched since timestamp,
@@ -50,16 +45,9 @@ class Halo(object):
             list: List of dictionary objects describing all issues since
                 timestamp.
         """
-        # Create a list of issue types to suppress
-        suppressed_types = []
-        if "no_sva" in kwargs and kwargs["no_sva"] is True:
-            suppressed_types.append("sva")
-            msg = "Not retrieving SVA issues (config item ${NO_SVA} is True)"
-            self.logger.info(msg)
         # Create a set of all issue IDs in scope for this run of the tool.
         all_issue_ids = {x["id"] for x in
-                         self.get_issues_touched_since(timestamp,
-                                                       critical_only)}
+                         self.get_issues_touched_since(timestamp, filters)}
         issue_getter = self.get_issue_full
         msg = "Describing all Halo issues. Concurrency: {}".format(str(self.describe_issues_threads))  # NOQA
         self.logger.debug(msg)
@@ -69,8 +57,7 @@ class Halo(object):
         pool.close()
         pool.join()
         results_cleaned = [x['issue'] for x in results if x is not None]
-        retval = [self.time_label_issue(x) for x in results_cleaned
-                  if x["type"] not in suppressed_types]
+        retval = [self.time_label_issue(x) for x in results_cleaned]
         if len(retval) != len(results):
             msg = "Of {} issues, {} are not filtered out.".format(len(results),
                                                                   len(retval))
@@ -110,7 +97,7 @@ class Halo(object):
         except cloudpassage.CloudPassageResourceExistence:
             return None
 
-    def get_issues_touched_since(self, timestamp, critical_only=True):
+    def get_issues_touched_since(self, timestamp, filters):
         """Return all issues created,resolved, or last seen since timestamp.
 
         Args:
@@ -121,24 +108,27 @@ class Halo(object):
         Returns:
             dict
         """
-        if critical_only:
-            all_issues = self.issues.list_all(
-                critical=True,
-                state="active,deactivated,missing,retired",
-                since=timestamp)
-        else:
-            all_issues = self.issues.list_all(
-                state="active,deactivated,missing,retired",
-                since=timestamp)
+        issue_filters = filters["issue"]
+        csp_tag_filters = []
+        if "csp_tags" in filters["issue"]:
+            csp_tag_filters = filters["issue"]["csp_tags"]
+            del issue_filters["csp_tags"]
+
+        all_issues = self.issues.list_all(
+            status="active,resolved",
+            since=timestamp,
+            **issue_filters
+        )
+
         msg = "Issues to process: {}".format(len(all_issues))
         self.logger.info(msg)
         labeled = [self.time_label_issue(x) for x in all_issues]
         # Ensure time filtering works
-        issues_filtered = [x for x in labeled if
-                           self.targeted_date(x["tstamp"], timestamp)]
+        issues_time_filtered = [x for x in labeled if
+                                self.targeted_date(x["tstamp"], timestamp)]
         discarded_issues = [x for x in labeled if not
-                            self.targeted_date(x["tstamp"], timestamp)]
-        bad = len(labeled) - len(issues_filtered)
+        self.targeted_date(x["tstamp"], timestamp)]
+        bad = len(labeled) - len(issues_time_filtered)
         msg = "Discarding {} issues outside of time range".format(bad)
         if bad != 0:
             self.logger.info(msg)
@@ -146,20 +136,17 @@ class Halo(object):
             msg = ("Issue out of tmie range (discarding): ID: {} Timestamp: "
                    "{}".format(d_i["id"], d_i["tstamp"]))
             self.logger.debug(msg)
+
+        # Filter on csp_tags
+        issues_filtered = [
+            x for x in issues_time_filtered if all(csp_tag in x.get('csp_tags', []) for csp_tag in csp_tag_filters)
+        ]
+
         # Deduplicate
         issues_dedup = self.deduplicate_issues(issues_filtered)
         issues_time_sorted = [x for x in sorted(issues_dedup,
                                                 key=itemgetter("tstamp"))]
-        issues_final = issues_time_sorted[:self.issue_sync_max]
-        limit_discarded = len(issues_time_sorted) - len(issues_final)
-        msg = ("Limiting sync to {} issues, discarding {} of "
-               "{}").format(self.issue_sync_max, limit_discarded,
-                            len(issues_time_sorted))
-        if limit_discarded:
-            self.logger.warn(msg)
-        else:
-            self.logger.debug(msg)
-        return issues_final
+        return issues_time_sorted
 
     @classmethod
     def time_label_issue(cls, issue):

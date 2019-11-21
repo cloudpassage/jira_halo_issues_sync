@@ -19,37 +19,35 @@ def main():
 
     # Create objects we'll interact with later
     halo = jlib.Halo(config.halo_api_key, config.halo_api_secret_key,
-                     config.halo_api_hostname, config.describe_issues_threads,
-                     config.issue_sync_max)
-
+                     config.halo_api_hostname, config.describe_issues_threads)
     # Get issues created, changed, deleted since starting timestamp
     msg = "Getting all Halo issues since {}".format(config.tstamp)  # NOQA
     logger.info(msg)
 
-    issues_filters = {"no_sva": config.no_sva}
-    halo_issues = halo.describe_all_issues(config.tstamp, config.critical_only,
-                                           **issues_filters)
+    for rule in config.rules:
+        halo_issues = halo.describe_all_issues(config.tstamp, rule["filters"])
 
-    # Print initial stats
-    jlib.Utility.print_initial_job_stats(config.tstamp, halo_issues)
+        # Print initial stats
+        jlib.Utility.print_initial_job_stats(config.tstamp, halo_issues)
 
-    # Bail here if there are no issues to process.
-    if not halo_issues:
-        logger.info("No issues to process!")
-        if config.state_manager:
-            config.state_manager.set_timestamp(starting_timestamp)
-        return {"result": json.dumps(
-                    {"message": "Halo/Jira issue sync complete",
-                     "total_issues": 0})}
+        # Bail here if there are no issues to process.
+        if not halo_issues:
+            logger.info("No issues to process!")
+            if config.state_manager:
+                config.state_manager.set_timestamp(starting_timestamp)
+            return {"result": json.dumps(
+                        {"message": "Halo/Jira issue sync complete",
+                         "total_issues": 0})}
 
-    # Compare Halo issue IDs against existing Jira issues, to determine
-    # what should be created, updated, closed, or reopened.
-    msg = "Getting Jira issues which correspond to Halo issues."
-    logger.info(msg)
-    marching_orders = jlib.Utility.get_marching_orders(config, halo_issues)
+        # Compare Halo issue IDs against existing Jira issues, to determine
+        # what should be created, updated, closed, or reopened.
+        msg = "Getting Jira issues which correspond to Halo issues."
+        logger.info(msg)
+        for project_key in rule['jira_config']['project_keys']:
+            marching_orders = jlib.Utility.get_marching_orders(config, rule, halo_issues, project_key)
 
-    # Reconcile.
-    jlib.Reconciler.reconcile_marching_orders(config, marching_orders)
+            # Reconcile.
+            jlib.Reconciler.reconcile_marching_orders(config, marching_orders, rule, project_key)
 
     logger.info("Done!")
     return {"result": json.dumps(

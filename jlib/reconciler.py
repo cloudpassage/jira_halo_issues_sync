@@ -1,4 +1,6 @@
 """Reconcile Halo issues against Jira."""
+import os
+import logging
 from multiprocessing.dummy import Pool as ThreadPool
 
 from .formatter import Formatter
@@ -32,18 +34,25 @@ class Reconciler(object):
         return
 
     @classmethod
-    def reconcile_marching_orders(cls, config, orders_dict):
+    def reconcile_marching_orders(cls, config, orders_dict, rule, project_key):
         batch_size = config.reconciler_threads * 2
         halo = Halo(config.halo_api_key, config.halo_api_secret_key,
                     config.halo_api_hostname, config.describe_issues_threads)
         jira = JiraLocal(config.jira_api_url, config.jira_api_user,
                          config.jira_api_token,
-                         config.jira_issue_id_field,
-                         config.jira_project_key,
-                         config.jira_issue_type)
+                         rule['jira_config']['jira_issue_id_field'],
+                         project_key,
+                         rule['jira_config']['jira_issue_type'])
         marching_orders = list(orders_dict.items())
         ordered_actions = sorted(marching_orders, key=cls.get_tstamp)
-        packed_list = [{"config": config,
+        logfilename = cls.get_logfilename(project_key)
+        handlers = [
+            logging.FileHandler(logfilename),
+            logging.StreamHandler()
+        ]
+        logger = Logger(handlers=handlers)
+        packed_list = [{"rule": rule,
+                        "logger": logger,
                         "issue_id": x[0],
                         "halo": halo,
                         "jira": jira,
@@ -66,6 +75,13 @@ class Reconciler(object):
         return
 
     @classmethod
+    def get_logfilename(cls, project_key):
+        """Return filename (path) for project log file"""
+        here_dir = os.path.abspath(os.path.dirname(__file__))
+        filename = os.path.join(here_dir, f'../log/{project_key}.log')
+        return filename
+
+    @classmethod
     def get_tstamp(cls, order):
         """Return the tstamp from the 'halo' section of a marching order."""
         return order[1]["halo"]["tstamp"]
@@ -84,14 +100,14 @@ class Reconciler(object):
                 ``config``, ``issue_id``, ``halo``, ``jira``, ``other``.
 
         """
-        config = reconcile_bundle["config"]
+        rule = reconcile_bundle["rule"]
         issue_id = reconcile_bundle["issue_id"]
         halo = reconcile_bundle["halo"]
         jira = reconcile_bundle["jira"]
         other = reconcile_bundle["other"]
-        logger = Logger()
-        reconciler = cls(halo, jira, config.jira_field_mapping,
-                         config.jira_field_static)
+        logger = reconcile_bundle["logger"]
+        reconciler = cls(halo, jira, rule["fields"]["mapping"],
+                         rule["fields"]["static"])
         action = other["disposition"][0]
         if action == "create":
             msg = "Creating Jira issue for Halo issue ID {}".format(issue_id)
@@ -99,11 +115,6 @@ class Reconciler(object):
             msg = ("Creating and closing Jira issue for Halo issue "
                    "ID {}".format(issue_id))
         elif action == "comment":
-            if config.no_comment:
-                msg = ("Commenting suppressed in config, skipping Halo issue "
-                       "{}".format(issue_id))
-                logger.info(msg)
-                return
             msg = "Commenting Jira issue for Halo issue ID {}".format(issue_id)
         elif action == "change_status":
             msg = ("Transitioning Jira issue for Halo issue ID "

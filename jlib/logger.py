@@ -4,10 +4,10 @@ import os
 
 
 class Logger(object):
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.logger = logging.getLogger(__name__)
         format = "%(asctime)-15s %(levelname)s %(name)s %(message)s"
-        logging.basicConfig(format=format)
+        logging.basicConfig(format=format, **kwargs)
         if os.getenv("DEBUG", "") in ["True", "true"]:
             self.set_debug()
         else:

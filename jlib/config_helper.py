@@ -2,6 +2,7 @@
 import datetime
 import os
 import sys
+import yaml
 
 from botocore.exceptions import ClientError
 from botocore.exceptions import ParamValidationError
@@ -14,31 +15,14 @@ class ConfigHelper(object):
     """Gather configuration from environment variables.
 
     Attributes:
-        critical_only (bool): Only sync critical issues.
         determinator_threads (int): Number of issues to be concurrently
             compared between Halo and Jira to determine the appropriate action
             to be taken (create, update, close, etc...).
         halo_api_key (str): Auditor API key for CloudPassage Halo.
         halo_api_secret_key (str): Halo API secret.
         halo_api_hostname (str): Halo API hostname.
-        issue_sync_max (int): Maximum number of issues to synchronize.
         jira_api_token (str): API token for Jira.
         jira_api_url (str): URL for Jira API.
-        jira_field_static (dict): Fields to statically populate in Jira.
-        jira_field_mapping (dict): Fields to map from Halo to Jira.
-        jira_issue_id_field (str): Halo issue ID will be stored in this field,
-            in Jira.
-        jira_project_key (str): Key for Jira project where all issues will be
-            created.
-        jira_issue_type (str): Type of issue to open (bug, etc...)
-        issue_close_transition (str): This transition will be used for closing
-            Jira issues.
-        issue_status_hard_closed (str): Issues with this status will not be
-            reopened. Instead, a new Jira issue will be created.
-        issue_reopen_transition (str): Reopened issues will be ceated with this
-            status.
-        no_comment (bool): If True, don't add comments to existing issues.
-        no_sva (bool): If True, don't synchronize SVA issues.
         reconciler_threads (int): Maximum number of issues to be simultameously
             recinciled between Halo and Jira.
         state_manager (None or instance of ManageState): This allows us to
@@ -48,126 +32,76 @@ class ConfigHelper(object):
             is configured to manage the timestamp between invocations.
     """
 
-    concurrency_defaults = {"describe_issues_threads": 10,
-                            "determinator_threads": 5,
-                            "reconciler_threads": 7}
-
-    required = ["critical_only",
-                "determinator_threads",
-                "halo_api_key",
-                "halo_api_secret_key",
-                "issue_close_transition",
-                "issue_reopen_transition",
-                "issue_status_closed",
-                "jira_api_token",
-                "jira_api_url",
-                "jira_api_user",
-                "jira_issue_id_field",
-                "jira_issue_type",
-                "jira_project_key",
-                "reconciler_threads",
-                "time_range"]
+    required_env = [
+        "halo_api_key",
+        "halo_api_secret_key",
+        "jira_api_token",
+        "jira_api_url",
+        "jira_api_user",
+        "time_range"
+    ]
 
     aws_ssm_default = "/CloudPassage-Jira/issues/timestamp"
 
     def __init__(self):
-        self.ref = [("critical_only", self.bool_from_env),
-                    ("halo_api_key", self.str_from_env),
-                    ("halo_api_secret_key", self.str_from_env),
-                    ("halo_api_hostname", self.str_from_env),
-                    ("jira_api_user", self.str_from_env),
-                    ("jira_api_token", self.str_from_env),
-                    ("jira_api_url", self.str_from_env),
-                    ("jira_field_static", self.dict_from_env),
-                    ("jira_field_mapping", self.dict_from_env),
-                    ("jira_issue_id_field", self.str_from_env),
-                    ("jira_project_key", self.str_from_env),
-                    ("jira_issue_type", self.str_from_env),
-                    ("issue_close_transition", self.str_from_env),
-                    ("issue_sync_max", self.int_from_env),
-                    ("issue_status_closed", self.str_from_env),
-                    ("issue_status_hard_closed", self.str_from_env),
-                    ("issue_reopen_transition", self.str_from_env),
-                    ("no_comment", self.bool_from_env),
-                    ("no_sva", self.bool_from_env),
-                    ("time_range", self.int_from_env)]
         self.logger = Logger()
+        self.rules = self.set_rules()
+        self.halo_api_key = os.getenv('HALO_API_KEY', "")
+        self.halo_api_secret_key = os.getenv('HALO_API_SECRET_KEY', "")
+        self.halo_api_hostname = os.getenv('HALO_API_HOSTNAME', "")
+        self.jira_api_user = os.getenv('JIRA_API_USER', "")
+        self.jira_api_token = os.getenv('JIRA_API_TOKEN', "")
+        self.jira_api_url = os.getenv('JIRA_API_URL', "")
+        self.time_range = int(os.getenv('TIME_RANGE', 15))
         self.aws_ssm_timestamp_param = os.getenv("AWS_SSM_TIMESTAMP_PARAM",
                                                  self.aws_ssm_default)
-        self.set_config_from_env()
+        self.describe_issues_threads = int(os.getenv("DESCRIBE_ISSUES_THREADS", 10))
+        self.determinator_threads = int(os.getenv("DETERMINATOR_THREADS", 5))
+        self.reconciler_threads = int(os.getenv("RECONCILER_THREADS", 7))
+
         self.state_manager = None
         self.set_timestamp_from_env()
 
-    @classmethod
-    def bool_from_env(cls, var_name):
-        """Return True if env var is set to "True" or "true", else False."""
-        logger = Logger()
-        result = False
-        if os.getenv(var_name) in ["True", "true"]:
-            result = True
-        logger.info("Setting {} to {}".format(var_name, str(result)))
-        return result
-
-    @classmethod
-    def dict_from_env(cls, var_name):
-        """Return dict derived from env var.
-
-        K:V;K:V
-        """
-        logger = Logger()
-        try:
-            result = {x.split(":")[0]: x.split(":")[1]
-                      for x in os.getenv(var_name).split(";")}
-        except AttributeError:
-            result = {}
-        except IndexError:
-            result = {}
-        logger.info("Setting {} to {}".format(var_name, str(result)))
-        return result
-
-    @classmethod
-    def int_from_env(cls, var_name):
-        """Return integer derived from env var."""
-        logger = Logger()
-        result = int(os.getenv(var_name, 0))
-        logger.info("Setting {} to {}".format(var_name, str(result)))
-        return result
-
-    @classmethod
-    def list_from_env(cls, var_name):
-        """Return a list derived from comma-separated value of env var."""
-        try:
-            return os.getenv(var_name).split(",")
-        except AttributeError:
-            return []
-
-    @classmethod
-    def str_from_env(cls, var_name):
-        """Return string from env var."""
-        return os.getenv(var_name, "")
-
     def required_vars_are_set(self):
         """Return True if all required vars are set, False otherwise."""
-        missing = [x for x in self.required
+        required_vars_set = True
+        env_missing = [x for x in self.required_env
                    if getattr(self, x) in [0, ""]
                    and not isinstance(getattr(self, x), bool)]
-        if missing:
-            msg = "Missing config attributes: {}".format(", ".join(missing))
+        if env_missing:
+            msg = "Missing config attributes: {}".format(", ".join(env_missing))
             self.logger.critical(msg)
-            return False
-        return True
+            required_vars_set = False
 
-    def set_config_from_env(self):
-        """Set instance attributes from env vars."""
-        for setting in self.ref:
-            varname = setting[0]
-            env_getter = setting[1]
-            env_var_name = varname.upper()
-            result = env_getter(env_var_name)
-            setattr(self, varname, result)
-        # Set concurrency vars
-        for varname, default in self.concurrency_defaults.items():
-            setattr(self, varname, int(os.getenv(varname.upper(), default)))
+        for rule in self.rules:
+            config_missing = []
+            if not rule['jira_config']['project_keys']: config_missing.append('project_keys')
+            if not rule['jira_config']['jira_issue_id_field']: config_missing.append('jira_issue_id_field')
+            if not rule['jira_config']['jira_issue_type']: config_missing.append('jira_issue_type')
+            if not rule['jira_config']['issue_close_transition']: config_missing.append('issue_close_transition')
+            if not rule['jira_config']['issue_reopen_transition']: config_missing.append('issue_reopen_transition')
+            if not rule['jira_config']['issue_status_closed']: config_missing.append('issue_status_closed')
+            if config_missing:
+                msg = f"Missing config attributes in {rule['name']}: {', '.join(config_missing)}"
+                self.logger.critical(msg)
+                required_vars_set = False
+        return required_vars_set
+
+    def set_rules(self):
+        rules = []
+        here_dir = os.path.abspath(os.path.dirname(__file__))
+        rules_dir = os.path.join(here_dir, '../config/routing')
+        for file in os.listdir(rules_dir):
+            filename = os.fsdecode(file)
+            filepath = os.path.join(rules_dir, filename)
+            with open(filepath, 'r') as stream:
+                try:
+                    rule = yaml.safe_load(stream)
+                    rule["name"] = filename
+                    rules.append(rule)
+                except yaml.YAMLError as exc:
+                    self.logger.error(exc)
+        return rules
 
     def set_timestamp_from_env(self):
         """Set self.tstamp for starting time.
