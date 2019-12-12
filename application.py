@@ -7,6 +7,8 @@ import os
 import sys
 import binascii
 from base64 import b64decode
+from itertools import groupby
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
 def main():
@@ -26,33 +28,45 @@ def main():
 
     for rule in config.rules:
         halo_issues = halo.describe_all_issues(config.tstamp, rule["filters"])
-
         # Print initial stats
         jlib.Utility.print_initial_job_stats(config.tstamp, halo_issues)
 
         # Bail here if there are no issues to process.
         if not halo_issues:
             logger.info("No issues to process!")
-            if config.state_manager:
-                config.state_manager.set_timestamp(starting_timestamp)
-            return {"result": json.dumps(
-                        {"message": "Halo/Jira issue sync complete",
-                         "total_issues": 0})}
 
         # Compare Halo issue IDs against existing Jira issues, to determine
         # what should be created, updated, closed, or reopened.
         msg = "Getting Jira issues which correspond to Halo issues."
         logger.info(msg)
-        for project_key in rule['jira_config']['project_keys']:
-            marching_orders = jlib.Utility.get_marching_orders(config, rule, halo_issues, project_key)
 
+        groupby_params = rule.get("groupby", [])
+        pool = ThreadPoolExecutor(max_workers=7)
+        marching_orders_futures = {}
+        for group_key, issues_group in groupby(halo_issues, key=lambda issue: {x: issue[x] for x in groupby_params}):
+            for project_key in rule['jira_config']['project_keys']:
+                args = (config, rule, project_key, group_key)
+                marching_orders_futures[pool.submit(jlib.Utility.get_marching_orders, list(issues_group), *args)] = args
+        issues_count = 0
+        for future in as_completed(marching_orders_futures):
             # Reconcile.
-            jlib.Reconciler.reconcile_marching_orders(config, marching_orders, rule, project_key)
+            args = marching_orders_futures[future]
+            marching_orders = future.result()
+            print(marching_orders)
+            issues_count += len(marching_orders.keys())
+            jlib.Reconciler.reconcile_marching_orders(marching_orders, *args)
 
     logger.info("Done!")
+    if not issues_count:
+        if config.state_manager:
+            config.state_manager.set_timestamp(starting_timestamp)
+        else:
+            config.write_timestamp_to_file(starting_timestamp)
+
+
     return {"result": json.dumps(
                 {"message": "Halo/Jira issue sync complete",
-                 "total_issues": len(marching_orders.items())})}
+                 "total_issues": issues_count})}
 
 
 def lambda_handler(event, context):

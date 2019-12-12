@@ -4,7 +4,7 @@ filters:
 #    asset_name: null
 #    asset_type: server
 #    cp_rule_id: null
-    critical: true
+#    critical: true
 #    csp_account_id: null
 #    csp_account_name: null
 #    csp_account_type: null
@@ -18,16 +18,16 @@ filters:
         value: production
 #      - key: null
 #        value: null
-#    cve_ids:
+#    cve_id:
 #      - null
 #      - null
-#    first_seen_at: 2018-12-18T14:38:58.21691Z
+#    first_seen_at: wrong
 #    group_name: customer-success
 #    image_sha: null
 #    name: null
 #    source: server_secure
 #    type: sva
-#    last_seen_at: 2018-12-18T14:38:58.21691Z
+#    last_seen_at: wrong
 #    max_cvss_gte: 7.0
 #    os_type: linux
 #    policy_name: CIS AWS Foundations Benchmark Customized v1.2 2019-07-11
@@ -35,7 +35,7 @@ filters:
 #    registry_name: null
 #    repository_id: null
 #    repository_name: null
-#    resolved_at: 2018-12-18T14:38:58.21691Z
+#    resolved_at: wrong
 #  asset:
 #    created_at: "2019-09-27T19:39:32.738Z"
 #    hostname: "ip-172-31-16-78"
@@ -58,6 +58,9 @@ filters:
 #    group_id: "91e35454024511e9a8444b54e5ae6c14"
 #    group_name: "CloudPassage Demo"
 #    firewall_policy: null
+groupby:
+  - type
+  - critical
 fields:
   mapping:
     # halo_field: jira_field
@@ -67,6 +70,7 @@ fields:
     issue.type: issue type
     issue.asset_type: asset type
   static:
+    duedate: 30
     # jira_field: static_value
 #    priority: High
 

@@ -34,7 +34,7 @@ class Reconciler(object):
         return
 
     @classmethod
-    def reconcile_marching_orders(cls, config, orders_dict, rule, project_key):
+    def reconcile_marching_orders(cls, orders_dict, config,  rule, project_key, group_key):
         batch_size = config.reconciler_threads * 2
         halo = Halo(config.halo_api_key, config.halo_api_secret_key,
                     config.halo_api_hostname, config.describe_issues_threads)
@@ -42,6 +42,7 @@ class Reconciler(object):
                          config.jira_api_token,
                          rule['jira_config']['jira_issue_id_field'],
                          project_key,
+                         group_key,
                          rule['jira_config']['jira_issue_type'])
         marching_orders = list(orders_dict.items())
         ordered_actions = sorted(marching_orders, key=cls.get_tstamp)
@@ -70,15 +71,22 @@ class Reconciler(object):
             pool.join()
             if config.state_manager:
                 config.state_manager.increment_timestamp(batch_timestamp)
+            else:
+                config.write_timestamp_to_file(batch_timestamp)
         if config.state_manager:
             config.state_manager.set_timestamp(batch_timestamp)
+        else:
+            config.write_timestamp_to_file(batch_timestamp)
         return
 
     @classmethod
     def get_logfilename(cls, project_key):
         """Return filename (path) for project log file"""
         here_dir = os.path.abspath(os.path.dirname(__file__))
-        filename = os.path.join(here_dir, f'../log/{project_key}.log')
+        log_dir = os.path.join(here_dir, '../log')
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir)
+        filename = os.path.join(log_dir, f'{project_key}.log')
         return filename
 
     @classmethod

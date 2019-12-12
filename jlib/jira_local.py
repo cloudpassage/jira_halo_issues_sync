@@ -17,12 +17,14 @@ class JiraLocal(object):
         default_issue_type (str): Type name for newly-created issues
     """
     def __init__(self, jira_url, auth_user, auth_token, issue_id_field,
-                 default_project_id, default_issue_type):
+                 project_id, group_key, default_issue_type):
         self.jira_instance = JIRA(jira_url, basic_auth=(auth_user, auth_token))
         self.issue_id_field = issue_id_field
-        self.default_project_id = default_project_id
+        self.project_id = project_id
         self.default_issue_type = default_issue_type
+        self.group_key = group_key
         self.log = Logger()
+        self.epic_id = self.get_epic_id()
         return
 
     def get_jira_issues_for_halo_issue(self, issue_id):
@@ -39,6 +41,40 @@ class JiraLocal(object):
         results = self.jira_instance.search_issues(search_string)
         return results
 
+    def get_epic_id(self):
+        group_key_string = ''.join(map(str, sorted(list(self.group_key.values()))))
+        try:
+            epic_id = self.jira_instance.search_issues(
+                f'issuetype=Epic and project={self.project_id} and {self.issue_id_field}~"{group_key_string}"'
+            )[0].key
+            return epic_id
+        except IndexError:
+            return self.create_jira_epic(group_key_string)
+
+
+    def create_jira_epic(self, group_key_string):
+        if not self.group_key:
+            return None
+        # Get IDs for epic fields
+        epicname_field_id = None
+        key_field = None
+        for field in self.jira_instance.fields():
+            if field["name"] == "Epic Name":
+                epicname_field_id = field["id"]
+            if field["name"] == self.issue_id_field or field["id"] == self.issue_id_field:
+                key_field = field["id"]
+        epic_dict = {
+            'project': {'key': f'{self.project_id}'},
+            'summary': f'{group_key_string}',
+            epicname_field_id: f'{group_key_string}',
+            'description': f'{group_key_string}',
+            'issuetype': {'name': 'Epic'},
+            key_field: f'{group_key_string}'
+        }
+        epic_id = self.jira_instance.create_issue(fields=epic_dict)
+        return epic_id.key
+
+
     def create_jira_issue(self, summary, description, halo_issue_id,
                           field_mapping={}):
         """Create a Jira issue, return issue ID.
@@ -52,13 +88,26 @@ class JiraLocal(object):
         Returns:
             str: Jira issue ID
         """
+        epicname_field_id = None
+        new_issue_fields = [x for x in self.jira_instance.fields()]
         base_fields = {self.issue_id_field: halo_issue_id}
         field_mapping.update(base_fields)
-        new_issue = self.jira_instance.create_issue(
-                project=self.default_project_id,
-                issuetype={'name': self.default_issue_type},
-                summary=summary, description=description)
-        new_issue_fields = [x for x in self.jira_instance.fields()]
+
+        issue_dict = {
+            'project': {'key': self.project_id},
+            'issuetype': {'name': self.default_issue_type},
+            'summary': summary,
+            'description': description
+        }
+
+        if self.epic_id:
+            for field in self.jira_instance.fields():
+                if field["name"] == "Epic Link":
+                    epicname_field_id = field["id"]
+            issue_dict[epicname_field_id] = self.epic_id
+
+        new_issue = self.jira_instance.create_issue(fields=issue_dict)
+
         try:
             fixed_fields, errors = self.fix_meta_fields(new_issue_fields,
                                                         field_mapping)
@@ -96,7 +145,6 @@ class JiraLocal(object):
             tuple: (dict: Dictionary ready for updating Jira fields.,
                 list: Fields that didn't map.)
         """
-
         results = {}
         bad_fields = []
         valid_ids = {x["id"] for x in allowed}

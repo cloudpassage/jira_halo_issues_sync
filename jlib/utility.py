@@ -35,30 +35,31 @@ class Utility(object):
         return
 
     @classmethod
-    def get_marching_orders(cls, config, rule, issue_list, project_key):
-            """Map Halo issue IDs to thread pool for checking Jira issues."""
-            jira = JiraLocal(config.jira_api_url, config.jira_api_user,
-                             config.jira_api_token,
-                             rule['jira_config']['jira_issue_id_field'],
-                             project_key,
-                             rule['jira_config']['jira_issue_type'])
-            packed_list = [{"jira": jira, "halo": x} for x in issue_list]
-            determinator = Determinator(rule['jira_config']['issue_status_closed'],
-                                        rule['jira_config']['issue_close_transition'],
-                                        rule['jira_config']['issue_status_hard_closed'],
-                                        rule['jira_config']['issue_reopen_transition'])
-            issue_correlator_helper = cls.jira_issue_correlator
-            pool = ThreadPool(config.determinator_threads)
-            correlated_issues = pool.map(issue_correlator_helper, packed_list)
-            pool.close()
-            pool.join()
-            # Key is Halo issue ID, value is dict containing keys for
-            # disposition, Halo issue, and Jira issue.
-            marching_orders = {x["halo"]["id"]: {"disposition": determinator.get_disposition(x["halo"], x["jira"]),  # NOQA
-                                                 "halo": x["halo"],
-                                                 "jira": x["jira"]}
-                               for x in correlated_issues}
-            return marching_orders
+    def get_marching_orders(cls, issue_list, config, rule,  project_key, group_key):
+        """Map Halo issue IDs to thread pool for checking Jira issues."""
+        jira = JiraLocal(config.jira_api_url, config.jira_api_user,
+                         config.jira_api_token,
+                         rule['jira_config']['jira_issue_id_field'],
+                         project_key,
+                         group_key,
+                         rule['jira_config']['jira_issue_type'])
+        packed_list = [{"jira": jira, "halo": x} for x in issue_list]
+        determinator = Determinator(rule['jira_config']['issue_status_closed'],
+                                    rule['jira_config']['issue_close_transition'],
+                                    rule['jira_config']['issue_status_hard_closed'],
+                                    rule['jira_config']['issue_reopen_transition'])
+        issue_correlator_helper = cls.jira_issue_correlator
+        pool = ThreadPool(config.determinator_threads)
+        correlated_issues = pool.map(issue_correlator_helper, packed_list)
+        pool.close()
+        pool.join()
+        # Key is Halo issue ID, value is dict containing keys for
+        # disposition, Halo issue, and Jira issue.
+        marching_orders = {x["halo"]["id"]: {"disposition": determinator.get_disposition(x["halo"], x["jira"]),  # NOQA
+                                             "halo": x["halo"],
+                                             "jira": x["jira"]}
+                           for x in correlated_issues}
+        return marching_orders
 
     @classmethod
     def jira_issue_correlator(cls, bundle):
