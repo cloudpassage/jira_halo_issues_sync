@@ -9,30 +9,23 @@ from .logger import Logger
 
 
 class Halo(object):
-    def __init__(self, key, secret, api_host, describe_issues_threads):
+    def __init__(self, config):
         """Instantiate with key, secret, and API host.
 
         Args:
-            key (str): Halo API key.
-            secret (str): Halo API secret.
-            api_host (str): Hostname for CloudPassage API.
+            config (ConfigHelper): Config Object
         """
         self.logger = Logger()
         integration = self.get_integration_string()
-        self.session = cloudpassage.HaloSession(key, secret, api_host=api_host,
+        self.session = cloudpassage.HaloSession(config.key,
+                                                config.secret,
+                                                api_host=config.api_host,
                                                 integration_string=integration)
         self.issues = cloudpassage.Issue(self.session, endpoint_version=3)
         self.http_helper = cloudpassage.HttpHelper(self.session)
-        try:
-            self.session.authenticate_client()
-        except cloudpassage.CloudPassageAuthentication as e:
-            self.logger.critical("\nBad Halo API credentials!\n")
-            raise e
-        self.describe_issues_threads = describe_issues_threads
-        return
 
-    def describe_all_issues(self, timestamp, filters):
-        """Return list of all isssues since timestamp, described.
+    def get_issues(self, timestamp, filters):
+        """Return list of all issues since timestamp, described.
 
         This wraps the initial retrieval of all issues touched since timestamp,
         and makes multi-threaded calls to self.get_issue_full() to get the

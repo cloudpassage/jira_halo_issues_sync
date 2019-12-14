@@ -22,6 +22,7 @@ filters:
 #      - null
 #      - null
 #    first_seen_at: wrong
+#    group_id: null
 #    group_name: customer-success
 #    image_sha: null
 #    name: null

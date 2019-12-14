@@ -20,14 +20,12 @@ def main():
         sys.exit(1)
 
     # Create objects we'll interact with later
-    halo = jlib.Halo(config.halo_api_key, config.halo_api_secret_key,
-                     config.halo_api_hostname, config.describe_issues_threads)
+    halo = jlib.Halo(config)
     # Get issues created, changed, deleted since starting timestamp
-    msg = "Getting all Halo issues since {}".format(config.tstamp)  # NOQA
-    logger.info(msg)
+    logger.info(f"Getting all Halo issues since {config.tstamp}")
 
     for rule in config.rules:
-        halo_issues = halo.describe_all_issues(config.tstamp, rule["filters"])
+        halo_issues = halo.get_issues(config.tstamp, rule["filters"])
         # Print initial stats
         jlib.Utility.print_initial_job_stats(config.tstamp, halo_issues)
 

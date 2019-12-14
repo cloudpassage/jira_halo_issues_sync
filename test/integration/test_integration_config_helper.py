@@ -1,7 +1,10 @@
+import pytest
+
 import jlib
 
 
 class TestIntegrationConfigHelper:
+    @pytest.mark.slow
     def test_integration_confighelper_instantiate_narp(self, monkeypatch):
         monkeypatch.setenv("CRITICAL_ONLY", "True")
         monkeypatch.setenv("HALO_API_KEY", "abc123")
