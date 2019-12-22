@@ -1,16 +1,9 @@
 """Manage configuration for application."""
-import datetime
 import os
-import sys
 import yaml
-import dateutil.parser
-from pathlib import Path
-
-from botocore.exceptions import ClientError
-from botocore.exceptions import ParamValidationError
-
+from jira import JIRA
+from jira.exceptions import JIRAError
 from .logger import Logger
-from .manage_state import ManageState
 
 
 class ConfigHelper(object):
@@ -22,8 +15,6 @@ class ConfigHelper(object):
         halo_api_hostname (str): Halo API hostname.
         jira_api_token (str): API token for Jira.
         jira_api_url (str): URL for Jira API.
-        state_manager (None or instance of ManageState): This allows us to
-            manage a timestamp placeholder between invocations.
         time_range (int): Number of minutes in the past to query for Halo
             issues to sync. Defaults to 15. This setting is ignored if AWS SSM
             is configured to manage the timestamp between invocations.
@@ -32,21 +23,54 @@ class ConfigHelper(object):
     def __init__(self):
         self.logger = Logger()
         self.rules = self.set_rules()
+        # pprint(self.rules)
         self.config = self.set_config()
         self.halo_api_key = os.getenv('HALO_API_KEY') or self.config.get('HALO_API_KEY')
         self.halo_api_secret_key = os.getenv('HALO_API_SECRET_KEY') or self.config.get('HALO_API_SECRET_KEY')
-        self.halo_api_hostname = os.getenv('HALO_API_HOSTNAME') or self.config.get('HALO_API_HOSTNAME')
+        self.halo_api_hostname = os.getenv('HALO_API_HOSTNAME') or \
+                                 self.config.get('HALO_API_HOSTNAME', "api.cloudpassage.com")
         self.jira_api_user = os.getenv('JIRA_API_USER') or self.config.get('JIRA_API_USER')
         self.jira_api_token = os.getenv('JIRA_API_TOKEN') or self.config.get('JIRA_API_TOKEN')
         self.jira_api_url = os.getenv('JIRA_API_URL') or self.config.get('JIRA_API_URL')
         self.time_range = int(os.getenv('TIME_RANGE', 15)) or self.config.get('TIME_RANGE')
-        self.aws_ssm_timestamp_param = os.getenv("AWS_SSM_TIMESTAMP_PARAM", "/CloudPassage-Jira/issues/timestamp")
-        self.state_manager = None
-        self.tstamp = self.set_timestamp_from_env() or self.set_timestamp_from_file()
+        self.jira_fields_dict = self.set_jira_fields(self.jira_api_user, self.jira_api_token, self.jira_api_url)
 
-    def required_vars_are_set(self):
+    def set_jira_fields(self, auth_user, auth_token, jira_url):
+        jira = JIRA(jira_url, basic_auth=(auth_user, auth_token))
+        jira_fields = {}
+        for field in jira.fields():
+            jira_fields[field["name"]] = field["id"]
+            jira_fields[field["id"]] = field["id"]
+        return jira_fields
+
+    def validate_config(self):
         """Return True if all required vars are set, False otherwise."""
-        required_vars_set = True
+        validation_passed = True
+        validation_passed = self.validate_creds()
+        validation_passed = self.validate_rules()
+        validation_passed = self.validate_jira_fields()
+        return validation_passed
+
+    def validate_jira_fields(self):
+        validation_passed = True
+        if self.rules:
+            for rule in self.rules:
+                invalid_fields = []
+                fields = rule.get("fields") or {}
+                mapping = fields.get("mapping") or {}
+                static = fields.get("static") or {}
+                for value in mapping.values():
+                    if value not in self.jira_fields_dict:
+                        invalid_fields.append(value)
+                for key in static.keys():
+                    if key not in self.jira_fields_dict:
+                        invalid_fields.append(key)
+                if invalid_fields:
+                    self.logger.critical(f"Invalid field names in '{rule['name']}': {', '.join(invalid_fields)}")
+                    validation_passed = False
+        return validation_passed
+
+    def validate_creds(self):
         missing_vars = []
         if not self.halo_api_key:
             missing_vars.append('HALO_API_KEY')
@@ -61,11 +85,14 @@ class ConfigHelper(object):
 
         if missing_vars:
             self.logger.critical(f"Missing config attributes: {','.join(missing_vars)}")
-            required_vars_set = False
+            return False
+        return True
 
+    def validate_rules(self):
+        validation_passed = True
         if not self.rules:
             self.logger.critical("At least one routing rule .yaml file required in 'config/routing/'")
-            required_vars_set = False
+            return False
 
         for rule in self.rules:
             rule_missing = []
@@ -76,20 +103,21 @@ class ConfigHelper(object):
                     rule_missing.append('jira_issue_id_field')
                 if not rule['jira_config'].get('jira_issue_type', None):
                     rule_missing.append('jira_issue_type')
-                if not rule['jira_config'].get('issue_close_transition', None):
-                    rule_missing.append('issue_close_transition')
-                if not rule['jira_config'].get('issue_reopen_transition', None):
-                    rule_missing.append('issue_reopen_transition')
+                if not rule['jira_config'].get('issue_status_active', None):
+                    rule_missing.append('issue_status_active')
                 if not rule['jira_config'].get('issue_status_closed', None):
                     rule_missing.append('issue_status_closed')
+                if not rule['jira_config'].get('issue_status_reopened', None):
+                    rule_missing.append('issue_status_reopened')
             except KeyError:
                 self.logger.critical(f"Missing 'jira_config' field in {rule['name']}")
-                required_vars_set = False
+                validation_passed = False
+                continue
             if rule_missing:
                 msg = f"Missing 'jira_config' attributes in '{rule['name']}': {', '.join(rule_missing)}"
                 self.logger.critical(msg)
-                required_vars_set = False
-        return required_vars_set
+                validation_passed = False
+        return validation_passed
 
     def set_config(self):
         config = {}
@@ -125,54 +153,3 @@ class ConfigHelper(object):
         here_dir = os.path.abspath(os.path.dirname(__file__))
         abs_path = os.path.join(here_dir, rel_path)
         return abs_path
-
-    def set_timestamp_from_file(self):
-        tstamp_dir = self.relpath_to_abspath('../timestamp')
-        try:
-            tstamp_file = os.listdir(tstamp_dir)[0]
-            tstamp = dateutil.parser.parse(os.fsdecode(tstamp_file))
-        except (IndexError, ValueError):
-            tstamp = (datetime.datetime.now()
-                           - datetime.timedelta(minutes=(abs(self.time_range)))).isoformat()
-        return tstamp
-
-    def write_timestamp_to_file(self, timestamp):
-        tstamp_dir = self.relpath_to_abspath('../timestamp')
-        if not os.path.exists(tstamp_dir):
-            os.makedirs(tstamp_dir)
-        new_file_path = os.path.join(tstamp_dir, timestamp)
-        try:
-            tstamp_filename = os.fsdecode(os.listdir(tstamp_dir)[0])
-            old_file_path = os.path.join(tstamp_dir, tstamp_filename)
-            os.rename(old_file_path, new_file_path)
-        except IndexError:
-            Path(new_file_path).touch()
-
-    def set_timestamp_from_env(self):
-        """Set self.tstamp for starting time.
-
-        AWS-SSM configuration for supersedes the TIME_RANGE env var
-        setting.
-        """
-        msg = "SSM timestamp param: {}".format(self.aws_ssm_timestamp_param)
-        self.logger.info(msg)
-        try:
-            self.state_manager = ManageState(self.aws_ssm_timestamp_param)
-            return self.state_manager.get_timestamp()
-        except ValueError:
-            return
-        except ClientError as e:
-            if "ParameterNotFound" in repr(e):
-                msg = ("Parameter {} not found. Will create param, set it and "
-                       "exit.".format(self.aws_ssm_timestamp_param))
-                tstamp = (datetime.datetime.now()
-                          - datetime.timedelta(minutes=(abs(self.time_range)))).isoformat()  # NOQA
-                self.state_manager.set_timestamp(tstamp)
-                self.logger.error(msg)
-                sys.exit(1)
-            msg = "AWS role configuration issue: {}".format(e)
-            self.logger.error(msg)
-            sys.exit(1)
-        except ParamValidationError as e:
-            self.logger.error("SSM Parameter validation failed: {}".format(e))
-            sys.exit(1)

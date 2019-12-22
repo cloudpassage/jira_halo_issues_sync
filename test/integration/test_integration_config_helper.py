@@ -19,7 +19,7 @@ class TestIntegrationConfigHelper:
         monkeypatch.setenv("TIME_RANGE", "30")
         helper = jlib.ConfigHelper()
         assert helper
-        req_check = helper.required_vars_are_set()
+        req_check = helper.validate_config()
         assert req_check is False
 
     def test_integration_confighelper_instantiate_1(self, monkeypatch):
@@ -38,7 +38,7 @@ class TestIntegrationConfigHelper:
         monkeypatch.setenv("TIME_RANGE", "30")
         helper = jlib.ConfigHelper()
         assert helper
-        assert helper.required_vars_are_set()
+        assert helper.validate_config()
 
     def test_integration_confighelper_instantiate_2(self, monkeypatch):
         """CRITICAL_ONLY = False"""
@@ -58,7 +58,7 @@ class TestIntegrationConfigHelper:
         helper = jlib.ConfigHelper()
         print(str(helper.critical_only))
         assert helper
-        assert helper.required_vars_are_set()
+        assert helper.validate_config()
 
     def test_integration_confighelper_instantiate_3(self, monkeypatch):
         """CRITICAL_ONLY defaults to False"""
@@ -77,4 +77,4 @@ class TestIntegrationConfigHelper:
         helper = jlib.ConfigHelper()
         print(str(helper.critical_only))
         assert helper
-        assert helper.required_vars_are_set()
+        assert helper.validate_config()

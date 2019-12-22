@@ -60,7 +60,6 @@ filters:
 #    firewall_policy: null
 groupby:
   - type
-  - critical
 fields:
   mapping:
     # halo_field: jira_field
@@ -80,8 +79,8 @@ jira_config:
     - DEV
   jira_issue_id_field: halo_jira_id  # Required
   jira_issue_type: Bug  # Required
-  issue_close_transition: Done  # Required
-  issue_reopen_transition: To Do  # Required
+  issue_status_active: To Do  # Required
   issue_status_closed: Done  # Required
+  issue_status_reopened: To Do # Required
   issue_status_hard_closed: null
 

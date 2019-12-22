@@ -21,8 +21,5 @@ class Formatter(object):
     @classmethod
     def format_summary(cls, issue_described):
         """Format summary string."""
-        summary = f'Source: {issue_described["source"]} ' \
-                  f'Issue - Critical: {issue_described["critical"]} - ' \
-                  f'Type: {issue_described["type"]} - ' \
-                  f'Name: {issue_described["name"]}'
+        summary = issue_described["name"]
         return summary
