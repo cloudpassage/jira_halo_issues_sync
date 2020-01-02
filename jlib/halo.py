@@ -52,7 +52,7 @@ class Halo(object):
         return filtered_issues
 
     def get_asset_and_findings(self, issues):
-        with ThreadPoolExecutor(max_workers=os.cpu_count() * 4) as executor:
+        with ThreadPoolExecutor(max_workers=os.cpu_count() * 2) as executor:
             asset_future_to_issue = {
                 executor.submit(self.describe, issue["asset_url"]): issue for issue in issues
             }

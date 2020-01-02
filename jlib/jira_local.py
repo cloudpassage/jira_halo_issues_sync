@@ -20,7 +20,7 @@ class JiraLocal(object):
 
     def get_jira_issues(self, project_key, halo_issues):
         jira_issues_dict = {}
-        with ThreadPoolExecutor(max_workers=os.cpu_count()*4) as executor:
+        with ThreadPoolExecutor(max_workers=os.cpu_count()*2) as executor:
             future_to_issue_id = {
                 executor.submit(
                     self.get_jira_issues_for_halo_issue, issue["id"], project_key
@@ -132,7 +132,7 @@ class JiraLocal(object):
         return summary, description, field_mapping
 
     def push_issues(self, issues, jira_epics_dict, jira_issues_dict, jira_fields_dict, fields, project_key=None):
-        with ThreadPoolExecutor(max_workers=os.cpu_count() * 4) as executor:
+        with ThreadPoolExecutor(max_workers=os.cpu_count() * 2) as executor:
             for issue in issues:
                 jira_issues = jira_issues_dict.get(issue["id"])
                 if jira_issues:
@@ -148,7 +148,7 @@ class JiraLocal(object):
         epics_set = set(issue.raw["fields"][self.jira_fields_dict["Epic Link"]] for issue in jira_issues)
         jira_epics = self.get_jira_epics_or_issues(project_keys, "Epic", dict_format=False)
 
-        with ThreadPoolExecutor(max_workers=os.cpu_count() * 4) as executor:
+        with ThreadPoolExecutor(max_workers=os.cpu_count() * 2) as executor:
             for epic in jira_epics:
                 if epic.key not in epics_set:
                     self.log.info(f"Deleting epic: {epic.key}")

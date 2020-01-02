@@ -41,7 +41,7 @@ class Reconciler(object):
         futures_to_group_key = {}
         groupby_params = self.rule.get("groupby", [])
         sorted_issues = sorted(halo_issues, key=lambda issue: [issue[x] for x in groupby_params])
-        with ThreadPoolExecutor(max_workers=os.cpu_count()*4) as executor:
+        with ThreadPoolExecutor(max_workers=os.cpu_count()*2) as executor:
             for group_key, issues_group in groupby(
                     sorted_issues, key=lambda issue: {x: issue[x] for x in groupby_params}):
                 group_key_hash = ""
@@ -71,7 +71,7 @@ class Reconciler(object):
 
     def get_jira_halo_issues(self, jira_issues_dict):
         issues = []
-        with ThreadPoolExecutor(max_workers=os.cpu_count()*4) as executor:
+        with ThreadPoolExecutor(max_workers=os.cpu_count()*2) as executor:
             futures = [executor.submit(self.halo.issue.describe, issue_id) for issue_id in jira_issues_dict]
             for future in as_completed(futures):
                 try:

@@ -11,7 +11,6 @@ from base64 import b64decode
 
 def main():
     logger = jlib.Logger()
-    starting_timestamp = datetime.datetime.now().isoformat()
     # Get config
     config = jlib.ConfigHelper()
     if not config.validate_config():
