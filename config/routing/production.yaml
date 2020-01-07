@@ -10,14 +10,11 @@ filters:
 #    csp_account_type: null
 #    csp_image_id: ami-01bbe152bf19d0289
 #    csp_region: null
-    csp_resource_id: "i-0d318864f4a276ea4"
+#    csp_resource_id: "i-0d318864f4a276ea4"
 #    csp_resource_uri: null
 #    csp_service_type: null
     csp_tags:
-      - key: environment
-        value: production
-#      - key: null
-#        value: null
+      environment: "production"
 #    cve_id:
 #      - null
 #      - null
@@ -59,7 +56,7 @@ filters:
 #    group_name: "CloudPassage Demo"
 #    firewall_policy: null
 groupby:
-  - type
+  - csp_resource_id
 fields:
   mapping:
     # halo_field: jira_field
@@ -82,5 +79,4 @@ jira_config:
   issue_status_active: To Do  # Required
   issue_status_closed: Done  # Required
   issue_status_reopened: To Do # Required
-  issue_status_hard_closed: null
 

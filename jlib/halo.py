@@ -1,7 +1,7 @@
 import os
 import re
+import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from operator import itemgetter
 
 import cloudpassage
 
@@ -37,14 +37,13 @@ class Halo(object):
         """
         # Create a set of all issue IDs in scope for this run of the tool.
         issue_filters = filters.get("issue") or {}
-        csp_tag_filters = []
         if "csp_tags" in issue_filters:
-            csp_tag_filters = filters["issue"]["csp_tags"]
-            del issue_filters["csp_tags"]
+            csp_tags = issue_filters["csp_tags"]
+            csp_tags_formatted = re.sub('[{}]', '', json.dumps(csp_tags).replace(' ', ''))
+            issue_filters["csp_tags"] = csp_tags_formatted
 
-        all_issues = self.issue.list_all(**issue_filters)
+        filtered_issues = self.issue.list_all(**issue_filters)
 
-        filtered_issues = self.filter_issues(all_issues, "csp_tags", csp_tag_filters)
         if filtered_issues:
             self.logger.info(f"Issues to process: {len(filtered_issues)}")
             filtered_issues = self.get_asset_and_findings(filtered_issues)
@@ -63,15 +62,6 @@ class Halo(object):
             self.enrich_issues(asset_future_to_issue, 'asset')
             self.enrich_issues(findings_future_to_issue, 'findings')
             return issues
-
-    @staticmethod
-    def filter_issues(issues, field, csp_tag_filters):
-        if not issues:
-            return
-        issues_filtered = [
-            x for x in issues if all(csp_tag in x.get(field, []) for csp_tag in csp_tag_filters)
-        ]
-        return issues_filtered
 
     def enrich_issues(self, future_to_issue, type):
         for future in as_completed(future_to_issue):

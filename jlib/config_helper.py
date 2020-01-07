@@ -15,9 +15,6 @@ class ConfigHelper(object):
         halo_api_hostname (str): Halo API hostname.
         jira_api_token (str): API token for Jira.
         jira_api_url (str): URL for Jira API.
-        time_range (int): Number of minutes in the past to query for Halo
-            issues to sync. Defaults to 15. This setting is ignored if AWS SSM
-            is configured to manage the timestamp between invocations.
     """
 
     def __init__(self):
@@ -32,7 +29,6 @@ class ConfigHelper(object):
         self.jira_api_user = os.getenv('JIRA_API_USER') or self.config.get('JIRA_API_USER')
         self.jira_api_token = os.getenv('JIRA_API_TOKEN') or self.config.get('JIRA_API_TOKEN')
         self.jira_api_url = os.getenv('JIRA_API_URL') or self.config.get('JIRA_API_URL')
-        self.time_range = int(os.getenv('TIME_RANGE', 15)) or self.config.get('TIME_RANGE')
         self.jira_fields_dict = self.set_jira_fields(self.jira_api_user, self.jira_api_token, self.jira_api_url)
 
     def set_jira_fields(self, auth_user, auth_token, jira_url):

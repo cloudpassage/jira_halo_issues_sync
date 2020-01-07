@@ -26,12 +26,8 @@ class Reconciler(object):
         self.logger = Logger()
         self.config = config
         self.halo = Halo(config.halo_api_key, config.halo_api_secret_key, config.halo_api_hostname)
-        self.jira = JiraLocal(
-            config.jira_api_url,
-            config.jira_api_user,
-            config.jira_api_token,
-            rule['jira_config'],
-            config.jira_fields_dict)
+        self.jira = JiraLocal(config.jira_api_url, config.jira_api_user, config.jira_api_token, rule,
+                              config.jira_fields_dict)
         self.rule = rule
 
     def reconcile_issues(self, halo_issues, project_key):

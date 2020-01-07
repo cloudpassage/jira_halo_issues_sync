@@ -13,6 +13,15 @@ class Logger(object):
         else:
             self.set_info()
 
+    def get_logfile_path(self, rule_name):
+        """Return filename (path) for project log file"""
+        here_dir = os.path.abspath(os.path.dirname(__file__))
+        log_dir = os.path.join(here_dir, '../log')
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir)
+        filename = os.path.join(log_dir, f'{rule_name}.log')
+        return filename
+
     def set_debug(self):
         self.logger.setLevel(logging.DEBUG)
 

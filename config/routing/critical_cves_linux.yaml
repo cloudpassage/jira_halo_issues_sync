@@ -83,5 +83,4 @@ jira_config:
   issue_status_active: To Do  # Required
   issue_status_closed: Done  # Required
   issue_status_reopened: To Do # Required
-  issue_status_hard_closed: null
 
