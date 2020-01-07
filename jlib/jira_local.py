@@ -15,7 +15,7 @@ class JiraLocal(object):
         self.jira_config = rule['jira_config']
         self.jira_fields_dict = jira_fields_dict
         self.jira_issue_id_field_key = jira_fields_dict[rule['jira_config']["jira_issue_id_field"]]
-        self.log = Logger()
+        self.log = Logger(rule=rule)
         return
 
     def get_jira_issues(self, project_key, halo_issues):

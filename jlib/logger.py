@@ -5,9 +5,23 @@ import os
 
 class Logger(object):
     def __init__(self, **kwargs):
-        self.logger = logging.getLogger(__name__)
         format = "%(asctime)-15s %(levelname)s %(name)s %(message)s"
-        logging.basicConfig(format=format, **kwargs)
+        logging.basicConfig(format=format)
+        self.logger = logging.getLogger(__name__)
+        if "rule" in kwargs:
+            rule_name = kwargs["rule"]["name"].split(".")[0]
+            logFormatter = logging.Formatter("%(asctime)-15s %(levelname)s %(name)s %(message)s")
+            self.logger = logging.getLogger(rule_name)
+
+            logfile_path = self.get_logfile_path(rule_name)
+            fileHandler = logging.FileHandler(logfile_path)
+            fileHandler.setFormatter(logFormatter)
+            self.logger.addHandler(fileHandler)
+
+            consoleHandler = logging.StreamHandler()
+            consoleHandler.setFormatter(logFormatter)
+            self.logger.addHandler(consoleHandler)
+
         if os.getenv("DEBUG", "") in ["True", "true"]:
             self.set_debug()
         else:
@@ -15,6 +29,8 @@ class Logger(object):
 
     def get_logfile_path(self, rule_name):
         """Return filename (path) for project log file"""
+        if not rule_name:
+            return
         here_dir = os.path.abspath(os.path.dirname(__file__))
         log_dir = os.path.join(here_dir, '../log')
         if not os.path.exists(log_dir):
