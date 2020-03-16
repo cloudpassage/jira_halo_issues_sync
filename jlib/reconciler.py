@@ -87,6 +87,7 @@ class Reconciler(object):
         if halo_issues:
             self.logger.info(f"Updating {len(halo_issues)} active Jira issues")
             halo_issues = self.halo.get_asset_and_findings(halo_issues)
+            halo_issues = self.halo.get_cve_details(halo_issues)
             self.jira.push_issues(
                 halo_issues,
                 jira_epics_dict,

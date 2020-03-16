@@ -2,6 +2,7 @@ import os
 import re
 import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from pprint import pprint
 
 import cloudpassage
 
@@ -20,6 +21,7 @@ class Halo(object):
         self.session = cloudpassage.HaloSession(key, secret, api_host=api_host, integration_string=integration)
         self.issue = cloudpassage.Issue(self.session, endpoint_version=3)
         self.http_helper = cloudpassage.HttpHelper(self.session)
+        self.cve_detail = cloudpassage.CveDetails(self.session)
 
     def get_issues(self, filters):
         """Return list of all issues since timestamp, described.
@@ -47,6 +49,7 @@ class Halo(object):
         if filtered_issues:
             self.logger.info(f"Issues to process: {len(filtered_issues)}")
             filtered_issues = self.get_asset_and_findings(filtered_issues)
+            filtered_issues = self.get_cve_details(filtered_issues)
 
         return filtered_issues
 
@@ -62,6 +65,33 @@ class Halo(object):
             self.enrich_issues(asset_future_to_issue, 'asset')
             self.enrich_issues(findings_future_to_issue, 'findings')
             return issues
+
+    def get_cve_details(self, issues):
+        with ThreadPoolExecutor(max_workers=os.cpu_count() * 2) as executor:
+            cve_ids = set(cve for issue in issues for cve in issue.get("cve_ids", []))
+            cve_future_to_cve = {executor.submit(self.cve_detail.describe, cve_id): cve_id for cve_id in cve_ids}
+            cve_dict = self.get_cve_dict(cve_future_to_cve)
+            pprint(cve_dict)
+            for issue in issues:
+                if issue["extended_attributes"] and "cve_info" in issue["extended_attributes"]:
+                    for cve in issue["extended_attributes"]["cve_info"]:
+                        try:
+                            del cve_dict[cve["id"]]["Vulnerable packages"]
+                        except KeyError:
+                            pass
+                        cve["detail"] = cve_dict[cve["id"]]
+            return issues
+
+    def get_cve_dict(self, cve_future_to_cve):
+        cve_dict = {}
+        for future in as_completed(cve_future_to_cve):
+            cve_id = cve_future_to_cve[future]
+            try:
+                cve_detail = future.result()
+                cve_dict[cve_id] = cve_detail
+            except Exception as e:
+                self.logger.error(f"{cve_id} generated an exception: {e}")
+        return cve_dict
 
     def enrich_issues(self, future_to_issue, type):
         for future in as_completed(future_to_issue):
