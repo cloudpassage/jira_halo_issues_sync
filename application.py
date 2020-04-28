@@ -7,60 +7,37 @@ import os
 import sys
 import binascii
 from base64 import b64decode
-from itertools import groupby
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
 def main():
     logger = jlib.Logger()
-    starting_timestamp = datetime.datetime.now().isoformat()
     # Get config
     config = jlib.ConfigHelper()
-    if not config.required_vars_are_set():
+    if not config.validate_config():
         sys.exit(1)
 
     # Create objects we'll interact with later
-    halo = jlib.Halo(config)
+    halo = jlib.Halo(config.halo_api_key, config.halo_api_secret_key, config.halo_api_hostname)
     # Get issues created, changed, deleted since starting timestamp
-    logger.info(f"Getting all Halo issues since {config.tstamp}")
+    logger.info(f"Getting all Halo issues")
+
+    issues_count = 0
 
     for rule in config.rules:
-        halo_issues = halo.get_issues(config.tstamp, rule["filters"])
+        halo_issues = halo.get_issues(rule.get("filters", {}))
+
         # Print initial stats
-        jlib.Utility.print_initial_job_stats(config.tstamp, halo_issues)
+        logger.info(f"Reconciling {len(halo_issues)} Halo issues")
+        reconciler = jlib.Reconciler(config, rule)
 
-        # Bail here if there are no issues to process.
-        if not halo_issues:
-            logger.info("No issues to process!")
+        if halo_issues:
+            for project_key in rule["jira_config"]["project_keys"]:
+                reconciler.reconcile_issues(halo_issues, project_key)
 
-        # Compare Halo issue IDs against existing Jira issues, to determine
-        # what should be created, updated, closed, or reopened.
-        msg = "Getting Jira issues which correspond to Halo issues."
-        logger.info(msg)
-
-        groupby_params = rule.get("groupby", [])
-        pool = ThreadPoolExecutor(max_workers=7)
-        marching_orders_futures = {}
-        for group_key, issues_group in groupby(halo_issues, key=lambda issue: {x: issue[x] for x in groupby_params}):
-            for project_key in rule['jira_config']['project_keys']:
-                args = (config, rule, project_key, group_key)
-                marching_orders_futures[pool.submit(jlib.Utility.get_marching_orders, list(issues_group), *args)] = args
-        issues_count = 0
-        for future in as_completed(marching_orders_futures):
-            # Reconcile.
-            args = marching_orders_futures[future]
-            marching_orders = future.result()
-            print(marching_orders)
-            issues_count += len(marching_orders.keys())
-            jlib.Reconciler.reconcile_marching_orders(marching_orders, *args)
+        reconciler.update_all_jira_issues()
+        reconciler.cleanup(rule["jira_config"]["project_keys"])
 
     logger.info("Done!")
-    if not issues_count:
-        if config.state_manager:
-            config.state_manager.set_timestamp(starting_timestamp)
-        else:
-            config.write_timestamp_to_file(starting_timestamp)
-
 
     return {"result": json.dumps(
                 {"message": "Halo/Jira issue sync complete",

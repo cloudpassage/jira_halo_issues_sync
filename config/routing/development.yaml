@@ -14,10 +14,7 @@ filters:
 #    csp_resource_uri: null
 #    csp_service_type: null
     csp_tags:
-      - key: environment
-        value: development
-#      - key: null
-#        value: null
+      environment: "development"
 #    cve_id:
 #      - null
 #      - null
@@ -59,8 +56,7 @@ filters:
 #    group_name: "CloudPassage Demo"
 #    firewall_policy: null
 groupby:
-  - type
-  - critical
+  - csp_resource_id
 fields:
   mapping:
     # halo_field: jira_field
@@ -80,8 +76,7 @@ jira_config:
     - DEV
   jira_issue_id_field: halo_jira_id  # Required
   jira_issue_type: Bug  # Required
-  issue_close_transition: Done  # Required
-  issue_reopen_transition: To Do  # Required
+  issue_status_active: To Do  # Required
   issue_status_closed: Done  # Required
-  issue_status_hard_closed: null
+  issue_status_reopened: To Do # Required
 
