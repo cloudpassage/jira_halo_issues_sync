@@ -105,3 +105,9 @@ venv.bak/
 
 # pycharm
 *.idea
+
+# creds
+config/etc/config.yaml
+
+#MAC
+*.DS_Store

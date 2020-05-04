@@ -8,217 +8,140 @@ Synchronize Halo issues with Jira
 
 [![Test Coverage](https://api.codeclimate.com/v1/badges/96396b330e4b5b954563/test_coverage)](https://codeclimate.com/github/cloudpassage/jira_halo_issues_sync/test_coverage)
 
-## What it does:
+## What it does
 
-This tool synchronizes
-[CloudPassage Halo issues](https://blog.cloudpassage.com/2017/05/30/issues-and-policies-with-halo/)
-with Jira issues.
+This tool filters issues discovered in Halo using issue attributes and then routes those issues to Jira projects
+specified in routing configuration files. These issues are then continuously synced as follows.
 
 New issues discovered in Halo cause new issues to be created in Jira.
 
-Updated issues in Halo will cause comments to be created in the corresponding
-Jira issue, containing information from the updated issue.
+Updated issues in Halo will update issues in Jira
 
 Closed issues in Halo will cause the corresponding Jira issue to be closed.
 
-Issues which have been prematurely closed will be re-opened if the Halo issue
-still exists, and issues which are re-opened will cause the corresponding Jira
+Jira issues which have been prematurely closed will be re-opened if the issue is still active in Halo
+ 
+Halo issues which are re-opened will cause the corresponding Jira
 issue to re-open.
-
-Version 2 of this integration will support issues associated with the
-CloudPassage Halo ServerSecure, ContainerSecure, and CloudSecure-related issues.
-
-## How it works
-
-This integration is delivered as Python tool, enclosed in a Docker container
-image. Sure, you can run the enclosed tool by itself... but running it outside
-the container image or Lambda (see LAMBDA.md) is not supported.
-
-The container is run periodically, and retrieves the status of all issues which
-have been opened, closed, or updated since the last time the tool was run. The
-tool then synchronizes Halo issue status with the status of the corresponding
-Jira issues.
-
-### Issue created
-
-When an issue is created, the integration will search for an existing issue in
-Jira by Halo issue ID. If a issue already exists with the issue ID, the
-operation will be treated as an `Issue updated` action. If no issue exists with
-the Halo issue ID, the integration will create the issue in Jira according to
-the field mappings defined in the runtime configuration, and having the status
-defined by ${NEW_ISSUE_STATUS} (see below).
-
-### Issue updated
-
-When a Halo issue is updated, the integration will search for the original
-issue in Jira. If no issue can be found in Jira for the associated Halo issue
-ID, this will be treated as an `Issue created` action. If a Jira issue is found
-for the updated issue, the integration will add a comment to the Jira issue
-containing the latest findings. These updates may happen as frequently as your
-configured scan interval.
-
-### Issue resolved
-
-When a Halo issue is resolved, the integration searches Jira for the
-corresponding issue, adds a comment to the issue with resolution information,
-and triggers the ${ISSUE_CLOSE_TRANSITION} in Jira (see below). If no Jira
-issue can be found with a corresponding Halo issue ID, this will be treated as
-an `Issue created`, then an `Issue resolved` event. This will effectively create
-and close a issue for tracking purposes in Jira.
-
-### Issue reopened
-
-When a Halo issue is re-opened, the integration searches for the closed Jira
-issue with the corresponding Halo issue ID. If none can be found, this is
-treated as an `Issue created` event. If the original issue can be located, an
-${ISSUE_REOPEN_TRANSITION} (see below) is triggered and a comment is added
-to the Jira issue containing information about why the issue was re-opened.
-If the issue has a status which matches one in ${HARD_CLOSED_STATUS}, a new
-issue will be opened.
-
-
 
 ## Requirements
 
 * CloudPassage Halo API key (with auditor permissions)
-* Jira Cloud API token (see __Jira permissions__, below)
-* Scheduling system
-  * Recommended: [CloudPassage Cortex](https://github.com/cloudpassage/cortex)
-  * If you're not using Cortex, you need a task scheduler and a Docker engine
-  to run the container.
-* Optional: Run in AWS Lambda!  See [LAMBDA.md](LAMBDA.md)
+* Jira Cloud API token. Requires permissions to create, search, and transition issues between workflow
+statuses
+* Scheduling system such as crontab
+* Python 3.6+ including packages specified in "requirements.txt"
+
+## Installation
+
+```git clone https://github.com/cloudpassage/jira_halo_issues_sync.git```
+
+## Configuration
+
+### Define environment variables
+Define the following environment variables:
+
+| Name                | Example                          | Explanation     |
+|---------------------|----------------------------------|-----------------|
+| HALO_API_KEY        | ayj198p9                         |                 |
+| HALO_API_SECRET_KEY | 6ulz0yy85xkxkjq8v9z5rahdm4aj909e |                 |
+| JIRA_API_USER       | username@cloudpassage.com        | Jira username   |
+| JIRA_API_TOKEN      | ayeulwtyhktcg53b7wb795as         |                 |
+| JIRA_API_URL        | https://yourdomain.atlassian.net | Jira domain URL |
+
+Make sure the Jira API user and key have privileges to create, update, delete, transition, and search issues
+for each project specified in the routing rules.
+
+### Setup routing rules
+
+Navigate to "/config/routing" and create routing files based on the template files given.
+Delete template files when finished.
+
+An example routing file:
+
+```yaml
+# For more information about filters go to https://api-doc.cloudpassage.com/help#issues-filtering-issues
+filters:
+  issue:
+    asset_id: 9c226eaa-a050-44b1-af19-a1541e2b6b1d
+    asset_name: ris-win2008r2-policy-test
+    asset_type: server
+    asset_fqdn: ip-172-31-6-100.us-west-1.compute.internal
+    asset_hostname: ip-172-31-6-100
+    cp_rule_id: CP:EC2:12
+    critical: true
+    csp_account_id: 849489318606
+    csp_account_name: cloudpassage-qa
+    csp_account_type: aws
+    csp_image_id: ami-01bbe152bf19d0289
+    csp_region: ap-south-1
+    csp_resource_id: i-0d318864f4a276ea4
+    csp_tags:
+      - key: environment
+        value: development
+      - key: Name
+        value: halo-aws-s1-ec2-bu01-02
+    cve_id:
+      - CVE-2017-10684
+      - CVE-2017-10685
+    first_seen_at: 2019-10-04T07:31:08.237537Z
+    group_id: b3d8bec2-6d9a-11e8-a7c2-59b3c642f12b
+    group_name: customer-success
+    image_sha: null
+    name: nameofissue
+    source: server_secure
+    type: sva
+    last_seen_at: 2020-04-27T14:35:53.035654Z
+    max_cvss_gte: 7.0
+    os_type: linux
+    policy_name: CIS AWS Foundations Benchmark Customized v1.2 2019-07-11
+    registry_id: c11da753-c69e-4a73-b15b-52c317708df7
+    registry_name: cloudpassage_registry
+    repository_id: ed843ea1-1f75-47c3-85ef-49a330c686af
+    repository_name: cloudpassage_repo
+groupby:
+  # Group issues into Jira epics based on specified attributes
+  - csp_resource_id
+fields:  # Optional
+  mapping:
+    # Maps Halo field to field in Jira. Values will then be dynamically populated for each issue.
+    # Make sure the custom Jira field is created in Jira
+    # Format is "halo_field: jira_field"
+    # e.g. "issue_source: jira_field_for_issue_source"
+    issue.source: issue source
+    issue.critical: critical
+    issue.type: issue type
+    issue.asset_type: asset type
+  static:
+    # Insert static value in a Jira field for each issue created
+    # jira_field: static_value
+    duedate: 30  # Specify duedate in number of days (Calculated from first_seen_at)
+
+jira_config:
+  project_keys:  # Required
+    # Enter Jira project keys to route issues to
+    - CL
+  jira_issue_id_field: halo_jira_id  # Required, Jira field that will contain the unique Halo Issue ID
+  jira_issue_type: Bug  # Required, Specify an issue type defined in Jira
+  issue_status_active: To Do  # Required, Specify a Jira workflow status for active issues
+  issue_status_closed: Done  # Required, Specify a Jira workflow status for closed issues
+  issue_status_reopened: To Do # Required, Specify a Jira workflow status for reopened
+```
+
 
 ## Running (stand-alone)
 
-1. Obtain Jira and CloudPassage Halo API credentials
-1. Set environment variables (see __Environment variables__, below.)
-1. Run the container:
-```
-docker run \
-    -it \
-    --rm \
-    --read-only \
-    -e ENV_VAR:${ENV_VAR} \ # one of these for every environment variable
-    docker.io/halotools/jira_halo_issues_sync:latest
+cd into "jira_halo_issues_sync" directory
+
+To invoke one time only:
+```python
+python application.py
 ```
 
-## Notes
+For scheduled job:
+(Crontab example)
 
-### Workflow considerations
-
-In order to route Jira issues to the appropriate people, we expect that a
-Jira workflow will perform the routing based on the Jira issue's contents, upon
-the creation of the issue in Jira.
-
-This integration will create all Jira issues in the same Jira project, and the
-implementer will use Jira workflows together with issue attributes (like
-`asset_group_path`, detailed below) to route issues to other projects or
-to assign issues to specific Jira users.
-
-The process whereby this integration updates or closes Jira issues does not
-search for issues within a specific project. It expects a searchable field to
-exist which contains the Halo issue ID, and as long as the issue exists
-somewhere in Jira (in any project), the integration will attempt to update the
-Jira issue. This is also the process by which the integration prevents the
-creation of duplicate issues for the same issue.
-
-In large environments with many Halo issues, this integration can produce a
-great number of issues in Jira. Consider creating workflows in Jira to group
-issues into epics, or create relevant dashboards which group issues based on
-group paths, issue type, or some other commonality relevant for the person
-tasked with resolving vulnerabilities.
-
-### Jira permissions
-
-This tool creates, updates, and performs workflow transitions on issues in Jira.
-The issue type and status transitions applied to issues created by this tool
-are completely configurable, as are field mappings from Halo to Jira. As such,
-it is not possible for us to create specific policy guidance which will allow
-you to maintain the principle of least privilege when configuring this
-synchronization tool.
-
-Every mature Jira implementation is different, and complexity can grow
-over time. Once you have a user account configured with the permissions you
-believe to be appropriate to create, update, and transition issues according
-to your workflow's requirements (and this tool's configuration), it makes sense
-to log in as that user and step through all the transitions you want the tool
-to perform manually. This will allow you to catch edge cases before deployment,
-and will make it easier to maintain the principle of least privilege. A
-preliminary validation process might look like this:
-
-* Log in as the user account which the integration will be using
-* Create a test issue of type `JIRA_ISSUE_TYPE`, with a unique string in the
-field named by `JIRA_ISSUE_ID_FIELD`.
-* Perform a search for the unique string you used in `JIRA_ISSUE_ID_FIELD`,
-and confirm that exactly one issue is found in Jira.
-* Add a comment to the test issue.
-* Transition the issue using the transition named in `ISSUE_CLOSE_TRANSITION`.
-* Transition the issue using the transition named in `ISSUE_REOPEN_TRANSITION`.
-* If your workflow automation migrates Jira issues between projects, you should
-confirm that the integration account can perform the transitions mentioned above
-in each of the projects where a Halo issue may be migrated.
-
-
-### Jira field mapping
-
-Mapping Halo issues to Jira fields can be accomplished by setting and passing
-the ${JIRA_FIELD_MAPPING} into the container. This field should be formatted
-like this: `halo_field_1:jira_field_1;halo_field_2:jira_field_2` (Note: semicolons must be escaped). 
-Similarly, the ${JIRA_FIELD_STATIC} mapping separates keys from values with a colon (:)
-and separates key/value pairs with a semicolon (;).
-
-Available Halo fields are:
-
-| Halo field             | Purpose                                                                                                   |
-|------------------------|-----------------------------------------------------------------------------------------------------------|
-| issue_name             | The display name of the issue in Halo; for example, Vulnerable package: systemd.x86_64.                   |
-| issue_source           | The product that generated the issue in Halo; that is, server_secure, cloud_secure, container_secure.     |
-| issue_group_name       | The Halo display name of the group to which the asset belongs; for example, Docker Hosts                  |
-| issue_critical         | `True` or `False`.                                                                                        |
-| issue_first_seen_at    | The date-time (in ISO 8601 format) of the most recent scan in which the issue was first detected.                                                       |
-| issue_last_seen_at     | The date-time (in ISO 8601 format) of the most recent scan in which the issue was last detected.                                                       |
-| issue_resolved_at      | The date-time (in ISO 8601 format) at which the issue was resolved. The value is null for active issues.                                                        |
-| issue_status           | The status of the issue: active or resolved. 
-| issue_csp_rule_id      | The friendly name of the CSP rule                                       |
-| issue_type             | lids, csm, fim, sva, sam, fw, agent, or image_sva                                                              |
-| issue_policy_name      | Name of Halo policy associated with this issue.                                                           |
-| issue_csp_account_type    | IaaS platform in which the asset exists                                                           |
-| issue_csp_account_id  | The unique identifier of the CSP account in which the asset exists (external id)                                                                 |
-| issue_csp_resource_id | The unique identifier of the asset in the CSP account                                                                |
-| issue_csp_account_name  | The Halo name of the cloud service provider account.                                                                  |
-| issue_csp_region       | The region in which the cloud service provider account exists; for example, eastus.                                                                  |
-| issue_csp_service_type      | The type of cloud service; for example, IAM, S3, EC2, and so on                                                                  |
-| issue_asset_id              | The Halo unique identifier of the affected asset                                                                                            |
-| issue_asset_name        | The name of the affected asset                                                           |
-| issue_asset_type           | The type of the asset affected. Includes: user, ami, instance, policy, virtual machine, security_group, server                                                                 |
-
-### Environment variables
-
-| Variable name            | Purpose                                                                                           |
-|--------------------------|---------------------------------------------------------------------------------------------------|
-| CRITICAL_ONLY            | Do not manage Jira issues for non-critical issues. (Default: False)                               |
-| NO_COMMENT               | (Optional) Do not add comments to already-existing Jira issues.                                   |
-| NO_SVA                   | (Optional) Do not synchronize SVA issues.                                                         |
-| ISSUE_SYNC_MAX           | Limit the number of issues synchronized this invocation.                                          |
-| DESCRIBE_ISSUES_THREADS  | Number of Halo issues to enrich from Halo API concurrently. Optional, default 10                  |
-| DETERMINATOR_THREADS     | Number of Halo issues to compare against Jira simultaneously. Optional, default 5                 |
-| RECONCILER_THREADS       | Number of Halo issues to reconcile to Jira simultaneously. Optional, default 7.                   |
-| HALO_API_KEY             | API key ID with auditor permissions.                                                              |
-| HALO_API_SECRET_KEY      | API secret corresponding with HALO_API_KEY.                                                       |
-| HALO_API_HOSTNAME        | Hostname for CloudPassage Halo API. Defaults to api.cloudpassage.com.                             |
-| JIRA_API_USER            | Username corresponding to JIRA_API_TOKEN.                                                         |
-| JIRA_API_TOKEN           | API token with access as described in __Jira permissions__, above.                                |
-| JIRA_API_URL             | API URL for Jira instance. (https://my.jira.com)                                                  |
-| TIME_RANGE               | Number of minutes since last run of tool. Optional, defaults to 15.                               |
-| JIRA_ISSUE_ID_FIELD      | Name of field in Jira issue for Halo issue ID. Used to prevent duplicate issues in Jira.          |
-| JIRA_FIELD_MAPPING       | (Optional) See __Jira field mapping__, above. \*                                                  |
-| JIRA_FIELD_STATIC        | (Optional) Set static values for fields in Jira issues                                            |
-| JIRA_PROJECT_KEY         | Project key for project where all new issues will be created.                                     |
-| ISSUE_REOPEN_TRANSITION  | Use this transition name for reopening Jira issues.                                               |
-| ISSUE_CLOSE_TRANSITION   | Use this transition name for closing Jira issues.                                                 |
-| ISSUE_STATUS_CLOSED      | This state is considered closed, but re-openable.                                                 |
-| STATUS_HARD_CLOSED       | Optional, comma-separated. If issue status matches, do not reopen, create a new issue.            |
-| JIRA_ISSUE_TYPE          | Type of issue to create (bug, story, etc...).                                                     |
-| EXCLUDE_SERVER_SECURE    | Do not manage issues for issues associated with Server Secure. (unsupported in v1)                |
-| EXCLUDE_CONTAINER_SECURE | Do not manage issues for issues associated with Container Secure. (unsupported in v1)             |
-| EXCLUDE_CLOUD_SECURE     | Do not manage issues for issues associated with Cloud Secure. (unsupported in v1)                 |
+```
+crontab -e
+*/2 * * * * /usr/bin/python application.py
+```

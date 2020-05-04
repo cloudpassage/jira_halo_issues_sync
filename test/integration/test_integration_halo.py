@@ -44,8 +44,8 @@ class TestIntegrationHalo:
 
     def test_describe_issues_touched_since_yesterday_noncrit_included(self):
         halo = self.get_halo_object()
-        issues_described = halo.describe_all_issues(self.get_iso_yesterday(),
-                                                    critical_only=False)
+        issues_described = halo.get_issues(self.get_iso_yesterday(),
+                                           critical_only=False)
         crits = [x for x in issues_described if x["critical"] is True]
         noncrits = [x for x in issues_described if x["critical"] is False]
         print("Crits: %s\tNon-crits: %s" % (len(crits), len(noncrits)))
@@ -54,8 +54,8 @@ class TestIntegrationHalo:
 
     def test_describe_issues_touched_since_yesterday_critical_only(self):
         halo = self.get_halo_object()
-        issues_described = halo.describe_all_issues(self.get_iso_yesterday(),
-                                                    critical_only=True)
+        issues_described = halo.get_issues(self.get_iso_yesterday(),
+                                           critical_only=True)
         total = len(issues_described)
         noncrits = [x for x in issues_described if x["critical"] is False]
         print("Crits: %s\tNon-crits: %s" % (total, len(noncrits)))
