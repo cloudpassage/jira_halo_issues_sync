@@ -80,10 +80,8 @@ filters:
     csp_region: ap-south-1
     csp_resource_id: i-0d318864f4a276ea4
     csp_tags:
-      - key: environment
-        value: development
-      - key: Name
-        value: halo-aws-s1-ec2-bu01-02
+      - environment:development
+      - Name:halo-aws-s1-ec2-bu01-02
     cve_id:
       - CVE-2017-10684
       - CVE-2017-10685
