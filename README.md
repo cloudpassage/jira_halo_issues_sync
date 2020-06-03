@@ -34,7 +34,10 @@ statuses
 
 ## Installation
 
-```git clone https://github.com/cloudpassage/jira_halo_issues_sync.git```
+```
+git clone https://github.com/cloudpassage/jira_halo_issues_sync.git
+pip install -r requirements.txt
+```
 
 ## Configuration
 
