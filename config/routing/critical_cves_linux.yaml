@@ -1,42 +1,42 @@
 filters:
   issue:
-    asset_id: null
-    asset_name: null
-    asset_type: null
-    cp_rule_id: null
+#    asset_id: null
+#    asset_name: null
+#    asset_type: null
+#    cp_rule_id: null
     critical: true
-    csp_account_id: null
-    csp_account_name: null
-    csp_account_type: null
-    csp_image_id: ami-01bbe152bf19d0289
-    csp_region: null
-    csp_resource_id: i-0d318864f4a276ea4
-    csp_resource_uri: null
-    csp_service_type: null
-    csp_tags:
-      - key: environment
-        value: development
-      - key: null
-        value: null
-    cve_id:
-      - null
-      - null
-    first_seen_at: wrong
-    group_id: null
-    group_name: customer-success
-    image_sha: null
-    name: null
-    source: server_secure
+#    csp_account_id: null
+#    csp_account_name: null
+#    csp_account_type: null
+#    csp_image_id: ami-01bbe152bf19d0289
+#    csp_region: null
+#    csp_resource_id: i-0d318864f4a276ea4
+#    csp_resource_uri: null
+#    csp_service_type: null
+#    csp_tags:
+#      - key: environment
+#        value: development
+#      - key: null
+#        value: null
+#    cve_id:
+#      - null
+#      - null
+#    first_seen_at: wrong
+#    group_id: null
+#    group_name: customer-success
+#    image_sha: null
+#    name: null
+#    source: server_secure
     type: sva
-    last_seen_at: wrong
+#    last_seen_at: wrong
     max_cvss_gte: 7.0
     os_type: linux
-    policy_name: CIS AWS Foundations Benchmark Customized v1.2 2019-07-11
-    registry_id: null
-    registry_name: null
-    repository_id: null
-    repository_name: null
-    resolved_at: wrong
+#    policy_name: CIS AWS Foundations Benchmark Customized v1.2 2019-07-11
+#    registry_id: null
+#    registry_name: null
+#    repository_id: null
+#    repository_name: null
+#    resolved_at: wrong
 groupby:
   - csp_resource_id
 fields:
