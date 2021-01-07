@@ -146,3 +146,8 @@ For scheduled job:
 crontab -e
 */2 * * * * /usr/bin/python application.py
 ```
+
+<!---
+#CPTAGS:community-supported integration automation
+#TBICON:images/python_icon.png
+-->
