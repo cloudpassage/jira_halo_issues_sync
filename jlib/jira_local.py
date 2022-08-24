@@ -4,9 +4,9 @@ import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from collections import defaultdict
 
-from .logger import Logger
-from .mapper import map_fields
-from .formatter import Formatter
+from jlib.logger import Logger
+from jlib.mapper import map_fields
+from jlib.formatter import Formatter
 
 
 class JiraLocal(object):

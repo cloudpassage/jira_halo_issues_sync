@@ -6,9 +6,9 @@ from cloudpassage.exceptions import CloudPassageResourceExistence
 from itertools import groupby
 import json
 import hashlib
-from .halo import Halo
-from .jira_local import JiraLocal
-from .logger import Logger
+from jlib.halo import Halo
+from jlib.jira_local import JiraLocal
+from jlib.logger import Logger
 
 
 class Reconciler(object):
@@ -54,7 +54,7 @@ class Reconciler(object):
                     issues_with_gk.append(issue)
             for future in as_completed(futures_to_group_key):
                 jira_epics_dict[futures_to_group_key[future]] = future.result()
-
+        
         fields = self.rule.get("fields") or {}
         self.jira.push_issues(
             issues_with_gk,

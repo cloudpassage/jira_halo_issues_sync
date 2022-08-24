@@ -2,47 +2,57 @@
 
 Synchronize Halo issues with Jira
 
+<!-- 
 [![Build Status](https://travis-ci.com/cloudpassage/jira_halo_issues_sync.svg?branch=master)](https://travis-ci.com/cloudpassage/jira_halo_issues_sync)
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/96396b330e4b5b954563/maintainability)](https://codeclimate.com/github/cloudpassage/jira_halo_issues_sync/maintainability)
 
 [![Test Coverage](https://api.codeclimate.com/v1/badges/96396b330e4b5b954563/test_coverage)](https://codeclimate.com/github/cloudpassage/jira_halo_issues_sync/test_coverage)
+-->
 
 ## What it does
 
 This tool filters issues discovered in Halo using issue attributes and then routes those issues to Jira projects
-specified in routing configuration files. These issues are then continuously synced as follows.
+specified in routing configuration files. These issues are then continuously synced as follows:
 
-New issues discovered in Halo cause new issues to be created in Jira.
+- New issues discovered in Halo cause new issues to be created in Jira.
 
-Updated issues in Halo will update issues in Jira
+- Updated issues in Halo will update issues in Jira
 
-Closed issues in Halo will cause the corresponding Jira issue to be closed.
+- Closed issues in Halo will cause the corresponding Jira issue to be closed.
 
-Jira issues which have been prematurely closed will be re-opened if the issue is still active in Halo
+- Jira issues which have been prematurely closed will be re-opened if the issue is still active in Halo
  
-Halo issues which are re-opened will cause the corresponding Jira
-issue to re-open.
+- Halo issues which are re-opened will cause the corresponding Jira issue to re-open.
+
+## Architecture
+- Architecture of HALO and JIRA Issues Sync Project
+
+![Alt text](./resources/Architecture.png?raw=true "Architecture of HALO and JIRA Issues Sync Project")
 
 ## Requirements
 
-* CloudPassage Halo API key (with auditor permissions)
-* Jira Cloud API token. Requires permissions to create, search, and transition issues between workflow
-statuses
-* Scheduling system such as crontab
-* Python 3.6+ including packages specified in "requirements.txt"
+- CloudPassage Halo API key (with auditor permissions).
+- Jira user account must have permissions to create, search, and transition issues between workflow statuses.
+- Jira Cloud API token (https://confluence.atlassian.com/cloud/api-tokens-938839638.html).
+- Scheduling system such as crontab.
+- Python 3.6+ including packages specified in "requirements.txt"
 
 ## Installation
 
+- Clone **"jira_halo_issues_sync"** Project from GitHub repository.
 ```
 git clone https://github.com/cloudpassage/jira_halo_issues_sync.git
+```
+
+- Install all required packages in file “requirements.txt”.
+```
 pip install -r requirements.txt
 ```
 
 ## Configuration
 
-### Define environment variables
-Define the following environment variables:
+### Define the following environment variables:
 
 | Name                | Example                          | Explanation     |
 |---------------------|----------------------------------|-----------------|
@@ -52,15 +62,43 @@ Define the following environment variables:
 | JIRA_API_TOKEN      | ayeulwtyhktcg53b7wb795as         |                 |
 | JIRA_API_URL        | https://yourdomain.atlassian.net | Jira domain URL |
 
-Make sure the Jira API user and key have privileges to create, update, delete, transition, and search issues
+**Note:** Make sure the Jira API user and key have privileges to create, update, delete, transition, and search issues
 for each project specified in the routing rules.
 
-### Setup routing rules
+### Setup Routing Rules
 
-Navigate to "/config/routing" and create routing files based on the template files given.
+- Navigate to "/config/routing" and create routing files based on the template files given.
 Delete template files when finished.
+- In /config/routing directory, define routing rules in YAML format.
+  - Define issue filters: Works the same way as portal UI and the API; Can use portal to get an idea of issues after filter is applied.
+    - Go to https://api-doc.cloudpassage.com/help#issues-filtering-issues for more info on filtering.
+  
+  - Define Group issues: Will create an epic in Jira for each group.
+    - Examples:
+      - type: epic group for sva, csm, lids, etc.
+      - csp_resource_id: epic group for each unique instance ID (for servers).
 
-An example routing file:
+  - Define Map Dynamic Fields: Maps CloudPassage Halo fields to custom fields in Jira.
+    - Actual values of Issue attributes will be dynamically populated.
+  
+  - Define Map Static Fields:
+    - A constant value can be specified in a static Jira field.
+    - Due date is calculated from the first_seen_at date of issue.
+  
+  - Specify the field in Jira that will contain the CloudPassage unique issue ID.
+    - This is how integration searches for issues and keeps them in sync.
+
+  - For each routing rule created, list the project keys that you want to route the filtered issues to.
+    - The list of projects must have the same workflow configuration.
+
+  - Specify the Jira workflow statuses that will map to issue active, closed, reopened respectively.
+    - Make sure transitions are available between these statuses.
+
+    ![Alt text](./resources/Jira_workflow.png?raw=true "JIRA Workflow")
+
+- **Note:** Custom fields created in Jira must be of type “text field”. For more information about creating custom fields in Jira go to: https://confluence.atlassian.com/adminjiraserver/adding-a-custom-field-938847222.html
+
+- An example routing file:
 
 ```yaml
 # For more information about filters go to https://api-doc.cloudpassage.com/help#issues-filtering-issues
@@ -132,22 +170,30 @@ jira_config:
 
 ## Running (stand-alone)
 
-cd into "jira_halo_issues_sync" directory
+- navigate into "jira_halo_issues_sync" directory
+```
+cd jira_halo_issues_sync
+```
 
-To invoke one time only:
-```python
+- To invoke one time only:
+```
 python application.py
 ```
 
-For scheduled job:
-(Crontab example)
-
+- For scheduled job:(Crontab example)
 ```
-crontab -e
-*/2 * * * * /usr/bin/python application.py
+crontab -e  */2 * * * * /usr/bin/python application.py
 ```
 
 <!---
 #CPTAGS:community-supported integration automation
 #TBICON:images/python_icon.png
 -->
+
+## Sample Results
+
+- List of HALO Issues in JIRA Project
+![Alt text](./resources/Issues_list.png?raw=true "HALO Issues List")
+
+- Details of HALO Issue in JIRA Project
+![Alt text](./resources/Issue_details.png?raw=true "HALO Issue Details")

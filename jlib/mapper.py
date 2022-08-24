@@ -1,4 +1,4 @@
-from .logger import Logger
+from jlib.logger import Logger
 from datetime import timedelta
 from dateutil.parser import isoparse
 

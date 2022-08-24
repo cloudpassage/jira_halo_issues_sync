@@ -3,7 +3,7 @@ import os
 import yaml
 from jira import JIRA
 from jira.exceptions import JIRAError
-from .logger import Logger
+from jlib.logger import Logger
 
 
 class ConfigHelper(object):
@@ -20,7 +20,7 @@ class ConfigHelper(object):
     def __init__(self):
         self.logger = Logger()
         self.rules = self.set_rules()
-        # pprint(self.rules)
+        #print(self.rules)
         self.config = self.set_config()
         self.halo_api_key = os.getenv('HALO_API_KEY') or self.config.get('HALO_API_KEY')
         self.halo_api_secret_key = os.getenv('HALO_API_SECRET_KEY') or self.config.get('HALO_API_SECRET_KEY')
