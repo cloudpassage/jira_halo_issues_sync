@@ -1,12 +1,10 @@
 import os
 import re
 import json
+import cloudpassage
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pprint import pprint
-
-import cloudpassage
-
-from .logger import Logger
+from jlib.logger import Logger
 
 
 class Halo(object):
