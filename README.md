@@ -185,6 +185,41 @@ python application.py
 crontab -e  */2 * * * * /usr/bin/python application.py
 ```
 
+## Running (Containerized)
+Be sure to inject all the environment variables defined above in the Docker run command as illustrated below.
+
+- navigate into "jira_halo_issues_sync" directory
+```
+cd jira_halo_issues_sync
+```
+
+- Build Docker Image:
+```
+docker build -t jira_halo_issues_sync .
+```
+
+- Run Docker Container (Linux):
+```
+docker run -it \
+    -e HALO_API_KEY=$HALO_API_KEY \
+    -e HALO_API_SECRET_KEY=$HALO_API_SECRET_KEY \
+    -e JIRA_API_USER=$JIRA_API_USER \
+	  -e JIRA_API_TOKEN=$JIRA_API_TOKEN \
+	  -e JIRA_API_URL=$JIRA_API_URL \
+    jira_halo_issues_sync
+```
+
+- Run Docker Container(Windows PowerShell):
+```
+docker run -it \
+    -e HALO_API_KEY=$env:HALO_API_KEY \
+    -e HALO_API_SECRET_KEY=$env:HALO_API_SECRET_KEY \
+    -e JIRA_API_USER=$env:JIRA_API_USER \
+	  -e JIRA_API_TOKEN=$env:JIRA_API_TOKEN \
+	  -e JIRA_API_URL=$env:JIRA_API_URL \
+    jira_halo_issues_sync
+```
+
 <!---
 #CPTAGS:community-supported integration automation
 #TBICON:images/python_icon.png
